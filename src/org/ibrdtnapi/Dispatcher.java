@@ -23,7 +23,7 @@ public class Dispatcher implements Observer {
 	@Override
 	public void update(Observable toSendBundles, Object o) {
 		System.out.println("notified");
-		System.out.println("Bundle to send:" + ((FifoQueue)toSendBundles).dequeue());
+		System.out.println("Bundle to send:" + (this.toSendBundles).dequeue());
 	}
 
 	public FifoQueue getReceivedBundles() {
