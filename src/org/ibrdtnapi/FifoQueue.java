@@ -14,6 +14,7 @@ public class FifoQueue extends Observable {
 	}
 
 	public boolean enqueue(Bundle bundle) {
+		if(bundle == null) return false;
 		boolean ret = this.bundles.add(bundle);
 		if(ret) {
 			setChanged();
