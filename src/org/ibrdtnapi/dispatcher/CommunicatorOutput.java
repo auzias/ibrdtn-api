@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.ibrdtnapi.Api;
+import org.ibrdtnapi.DaemonException;
 import org.ibrdtnapi.entities.Bundle;
 
 public class CommunicatorOutput {
@@ -24,8 +25,7 @@ public class CommunicatorOutput {
 			this.dos.write(str.getBytes());
 			this.dos.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DaemonException("Could not write to the scoket. " + e.getMessage());
 		}
 	}
 
@@ -38,7 +38,7 @@ public class CommunicatorOutput {
 		try {
 			synchronized(Api.lockFile) {
 				Api.logFile = new FileWriter(Api.LOG_FILE_PATH, Api.APPEND);
-				Api.logFile.append(str + "\n");
+				Api.logFile.append(">> " + str + "\n");
 				Api.logFile.flush();
 				Api.logFile.close();
 			}
