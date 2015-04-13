@@ -16,7 +16,7 @@ public abstract class BpApplication implements Observer {
 	private FifoBundleQueue toSendBundles = new FifoBundleQueue();
 
 	public BpApplication(String eid) {
-		if(eid == null) throw new ApiException("The endpoint must be not null.");
+		if(eid == null || eid.contains(" ")) throw new ApiException("The endpoint must be not null and not contain any space.");
 		Dispatcher dispatcher = new Dispatcher(toSendBundles, this, eid);
 		this.toSendBundles.addObserver(dispatcher);
 		this.receivedBundles = dispatcher.getReceivedBundles();
