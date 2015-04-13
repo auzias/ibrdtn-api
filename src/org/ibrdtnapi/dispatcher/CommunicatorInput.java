@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import org.ibrdtnapi.Api;
 import org.ibrdtnapi.ApiException;
 import org.ibrdtnapi.DaemonException;
+import org.ibrdtnapi.dispatcher.Dispatcher.State;
 import org.ibrdtnapi.entities.Bundle;
 import org.ibrdtnapi.entities.FifoBundleQueue;
 
@@ -17,6 +18,7 @@ public class CommunicatorInput implements Runnable {
 	private BufferedReader br = null;
 	private FifoBundleQueue toFetchBundles = new FifoBundleQueue();
 	private Dispatcher dispatcher = null;
+	private StringBuilder buffer = null;
 
 
 	public CommunicatorInput(BufferedReader br, Dispatcher dispatcher) {
@@ -43,24 +45,39 @@ public class CommunicatorInput implements Runnable {
 		String str;
 		try {
 			while ((str = this.br.readLine()) != null) {
-				this.parse(str);
-				//Log the line:
-				try {
-					synchronized(Api.lockFile) {
-						Api.logFile = new FileWriter(Api.LOG_FILE_PATH, Api.APPEND);
-						Api.logFile.append(str + "\n");
-						Api.logFile.flush();
-						Api.logFile.close();
-					}
-				} catch (IOException e) {
-					CommunicatorInput.log.info("Could not open the file '" + Api.LOG_FILE_PATH + "' to write it. Log will be display at finest level.");
-					CommunicatorInput.log.finest(str);
+				this.log(str);
+				if(this.dispatcher.getState() != State.BDL_LOADED) {
+					this.parse(str);
+				} else {
+					this.buffer.append(str + "\n");
+					if(str.startsWith("Encoding:"))
+						this.dispatcher.setState(State.INFO_BUFFERED);
 				}
 			}
 		} catch (IOException e) {
 			throw new DaemonException("Could not read from the socket. " + e.getMessage());
 		}
-		CommunicatorInput.log.exiting(CommunicatorInput.class.getName(), "run()");
+		CommunicatorInput.log.severe("Input from the daemon aborted!");
+	}
+
+	private void log(String str) {
+		try {
+			synchronized(Api.lockFile) {
+				Api.logFile = new FileWriter(Api.LOG_FILE_PATH, Api.APPEND);
+				Api.logFile.append("<< " + str + "\n");
+				Api.logFile.flush();
+				Api.logFile.close();
+			}
+		} catch (IOException e) {
+			CommunicatorInput.log.info("Could not open the file '" + Api.LOG_FILE_PATH + "' to write it. Log will be display at finest level.");
+			CommunicatorInput.log.finest(str);
+		}
+	}
+
+	public String getBuffer() {
+		String ret = this.buffer.toString();
+		this.buffer = new StringBuilder();//Clear the buffer
+		return ret;
 	}
 
 	private void parse(String str) {
@@ -78,7 +95,8 @@ public class CommunicatorInput implements Runnable {
 		}
 
 		if(str.startsWith("200 BUNDLE LOADED")) {
-			this.dispatcher.setState(Dispatcher.State.FETCHING);
+			this.dispatcher.setState(State.BDL_LOADED);
+			this.buffer = new StringBuilder();//Clear the buffer
 		}
 	}
 

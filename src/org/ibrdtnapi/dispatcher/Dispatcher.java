@@ -27,6 +27,7 @@ public class Dispatcher implements Observer {
 	private CommunicatorOutput communicatorOutput = null;
 	private Socket socket = null;
 	private String eid = null;
+	private Bundle fetchingBundle = null;
 
 	public Dispatcher(FifoBundleQueue toSendBundles, BpApplication application, String eid) {
 		this.toSendBundles = toSendBundles;
@@ -92,14 +93,17 @@ public class Dispatcher implements Observer {
 	}
 
 	private void fetch(Bundle bundle) {
-		this.setState(State.FETCHING);
-		this.communicatorOutput.query("bundle load " + bundle.getTimestamp() + " " + bundle.getBlockNumber() + " " + bundle.getSource());
-		bundle.setDestination("<local>/" + this.eid);
-		System.out.println("Fetching:" + bundle);
+		new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle)).start();
 	}
 
 	public FifoBundleQueue getReceivedBundles() {
 		return receivedBundles;
+	}
+
+	
+
+	public void setFetchingBundle(Bundle fetchingBundle) {
+		this.fetchingBundle = fetchingBundle;
 	}
 
 	public synchronized Dispatcher.State getState() {
@@ -116,7 +120,9 @@ public class Dispatcher implements Observer {
 		CONNECTED(0),		//Socket is established with the daemon
 		EXTENDED(1),		//The query 'protocol extended' returned '200 SWITCHED TO EXTENDED'
 		SENDING(2),			//The Communicator is sending bundle 
-		FETCHING(3);		//The Communicator is fetching bundle
+		BDL_LOADED(3),		//The Communicator is fetching bundle
+		BDL_FETCHED(4),		//The Communicator is fetching bundle
+		INFO_BUFFERED(5);	//The Communicator is buffered info bundle
 		public final int value;
 
 		State(int value) {
