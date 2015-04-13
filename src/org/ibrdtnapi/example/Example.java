@@ -4,16 +4,11 @@
  */
 package org.ibrdtnapi.example;
 
-import org.ibrdtnapi.Bundle;
+import org.ibrdtnapi.entities.Bundle;
 
 public class Example {
 
 	public static void main(String[] args) {
-		BpAppPrinting bpApp = new BpAppPrinting();
-		System.out.println("It's " + System.currentTimeMillis());
-		boolean sending = bpApp.send(new Bundle());
-		System.out.println("sending:" + sending);	
-
-		bpApp.getDispatcher().simulateBundle(new Bundle());
+		BpAppPrinting bpApp = new BpAppPrinting("azee");
 	}
 }

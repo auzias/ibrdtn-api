@@ -26,13 +26,11 @@ public class Dispatcher implements Observer {
 	private CommunicatorInput communicatorInput = null;
 	private CommunicatorOutput communicatorOutput = null;
 	private Socket socket = null;
-	private String eid = null;
 	private Bundle fetchingBundle = null;
 
 	public Dispatcher(FifoBundleQueue toSendBundles, BpApplication application, String eid) {
 		this.toSendBundles = toSendBundles;
 		this.receivedBundles.addObserver(application);
-		this.eid = eid;
 		this.connect(0, eid);
 	}
 
@@ -94,13 +92,13 @@ public class Dispatcher implements Observer {
 
 	private void fetch(Bundle bundle) {
 		new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle)).start();
+		while(this.getState() != State.BDL_READY);
+		this.receivedBundles.enqueue(this.fetchingBundle);
 	}
 
 	public FifoBundleQueue getReceivedBundles() {
 		return receivedBundles;
 	}
-
-	
 
 	public void setFetchingBundle(Bundle fetchingBundle) {
 		this.fetchingBundle = fetchingBundle;
@@ -122,7 +120,8 @@ public class Dispatcher implements Observer {
 		SENDING(2),			//The Communicator is sending bundle 
 		BDL_LOADED(3),		//The Communicator is fetching bundle
 		BDL_FETCHED(4),		//The Communicator is fetching bundle
-		INFO_BUFFERED(5);	//The Communicator is buffered info bundle
+		BDL_READY(5),
+		INFO_BUFFERED(6), PLD_BUFFERED(7);	//The Communicator is buffered info bundle
 		public final int value;
 
 		State(int value) {
