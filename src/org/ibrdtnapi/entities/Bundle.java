@@ -10,6 +10,7 @@ public class Bundle {
 	private String source = null;
 	private String destination = null;
 	private Bundle.State state = null;
+	private int length;
 
 	public Bundle() {
 
@@ -72,5 +73,9 @@ public class Bundle {
 
 	public void setDestination(String eid) {
 		this.destination = eid;
+	}
+
+	public int getLength() {
+		return this.length;
 	}
 }
