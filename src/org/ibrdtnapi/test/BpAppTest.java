@@ -3,11 +3,15 @@ package org.ibrdtnapi.test;
 import static org.junit.Assert.*;
 
 import org.ibrdtnapi.BpApplication;
-import org.ibrdtnapi.Bundle;
+import org.ibrdtnapi.entities.Bundle;
 import org.junit.Test;
 
 public class BpAppTest {
 	private class BpAppPrintingTest extends BpApplication {
+		public BpAppPrintingTest(String eid) {
+			super(eid);
+		}
+
 		@Override
 		protected void bundleReceived(Bundle b) {
 			System.out.println("[BpAppPrintingTest::bundleReceived]" +
@@ -17,7 +21,7 @@ public class BpAppTest {
 
 	@Test
 	public void testSend() {
-		BpAppPrintingTest app = new BpAppPrintingTest();
+		BpAppPrintingTest app = new BpAppPrintingTest("testing");
 		boolean send = app.send(null);
 		if(send) {
 			fail("null-bundle shoud not be send, and the method should return *false*");

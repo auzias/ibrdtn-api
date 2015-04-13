@@ -7,30 +7,29 @@ package org.ibrdtnapi;
 import java.util.Observable;
 import java.util.Observer;
 
-public abstract class BpApplication implements Observer {
-	private FifoQueue receivedBundles = null;
-	private FifoQueue toSendBundles = new FifoQueue();
-	private Dispatcher dispatcher = null;
+import org.ibrdtnapi.dispatcher.Dispatcher;
+import org.ibrdtnapi.entities.Bundle;
+import org.ibrdtnapi.entities.FifoBundleQueue;
 
-	public BpApplication() {
-		this.dispatcher = new Dispatcher(toSendBundles, this);
-		this.toSendBundles.addObserver(this.dispatcher);
-		this.receivedBundles = this.dispatcher.getReceivedBundles();
+public abstract class BpApplication implements Observer {
+	private FifoBundleQueue receivedBundles = null;
+	private FifoBundleQueue toSendBundles = new FifoBundleQueue();
+
+	public BpApplication(String eid) {
+		if(eid == null) throw new ApiException("The endpoint must be not null.");
+		Dispatcher dispatcher = new Dispatcher(toSendBundles, this, eid);
+		this.toSendBundles.addObserver(dispatcher);
+		this.receivedBundles = dispatcher.getReceivedBundles();
 	}
 
 	public boolean send(Bundle b) {
 		return this.toSendBundles.enqueue(b);
 	}
-
-	public Dispatcher getDispatcher(){
-		return this.dispatcher;
-	}
 	
 	@Override
 	public void update(Observable receivedBundles, Object o) {
-		if(this.receivedBundles == receivedBundles && !this.receivedBundles.isEmpty()) {
-			this.bundleReceived(((FifoQueue)receivedBundles).dequeue());
-		}
+		if(this.receivedBundles == receivedBundles && !this.receivedBundles.isEmpty())
+			this.bundleReceived(((FifoBundleQueue)receivedBundles).dequeue());
 	}
 
 	protected abstract void bundleReceived(Bundle b);

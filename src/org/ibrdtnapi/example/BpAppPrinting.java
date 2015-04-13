@@ -5,9 +5,13 @@
 package org.ibrdtnapi.example;
 
 import org.ibrdtnapi.BpApplication;
-import org.ibrdtnapi.Bundle;
+import org.ibrdtnapi.entities.Bundle;
 
 public class BpAppPrinting extends BpApplication {
+
+	public BpAppPrinting(String eid) {
+		super(eid);
+	}
 
 	@Override
 	protected void bundleReceived(Bundle b) {
