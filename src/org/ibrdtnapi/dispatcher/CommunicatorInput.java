@@ -48,7 +48,7 @@ public class CommunicatorInput implements Runnable {
 				this.log(str);
 				if(this.dispatcher.getState() != State.BDL_LOADED) {
 					this.parse(str);
-				} else {
+				} else if(this.dispatcher.getState() == State.BDL_LOADED){
 					this.buffer.append(str + "\n");
 					if(str.startsWith("Encoding:"))
 						this.dispatcher.setState(State.INFO_BUFFERED);
@@ -89,9 +89,9 @@ public class CommunicatorInput implements Runnable {
 		if(str.startsWith("602 NOTIFY BUNDLE")) { //i.e.: 602 NOTIFY BUNDLE 482241205 1 dtn://59/wfJQXpkXdWMBWUTv
 			String[] parsed = str.split(" ");
 			long timestamp = Long.parseLong(parsed[3]);
-			int blockNumber = Integer.parseInt(parsed[4]);;
+			int blockNumber = Integer.parseInt(parsed[4]);
 			String source = parsed[5];
-			this.toFetchBundles.enqueue(new Bundle(timestamp, blockNumber, source, null, Bundle.State.TO_FETCH));
+			this.toFetchBundles.enqueue(new Bundle(timestamp, blockNumber, source, null));
 		}
 
 		if(str.startsWith("200 BUNDLE LOADED")) {
@@ -99,5 +99,4 @@ public class CommunicatorInput implements Runnable {
 			this.buffer = new StringBuilder();//Clear the buffer
 		}
 	}
-
 }
