@@ -4,6 +4,10 @@
  */
 package org.ibrdtnapi.entities;
 
+/**
+ * The class Bundle represent bundle with ONLY ONE SINGLE BLOCK.  
+ *
+ */
 public class Bundle {
 	private long timestamp;
 	private int blockNumber;
@@ -11,6 +15,11 @@ public class Bundle {
 	private String destination = null;
 	private Bundle.State state = null;
 	private int length;
+	private int flags = 0;
+	private int sequencenumber = 0;
+	private String reportto = null;
+	private String custodian = null;
+	private int lifetime = 0;
 
 	public Bundle() {
 
@@ -38,6 +47,62 @@ public class Bundle {
 
 	public int getBlockNumber() {
 		return blockNumber;
+	}
+
+	public int getFlags() {
+		return flags;
+	}
+
+	public void setFlags(int flags) {
+		this.flags = flags;
+	}
+
+	public int getSequencenumber() {
+		return sequencenumber;
+	}
+
+	public void setSequencenumber(int sequencenumber) {
+		this.sequencenumber = sequencenumber;
+	}
+
+	public String getReportto() {
+		return reportto;
+	}
+
+	public void setReportto(String reportto) {
+		this.reportto = reportto;
+	}
+
+	public String getCustodian() {
+		return custodian;
+	}
+
+	public void setCustodian(String custodian) {
+		this.custodian = custodian;
+	}
+
+	public int getLifetime() {
+		return lifetime;
+	}
+
+	public void setLifetime(int lifetime) {
+		this.lifetime = lifetime;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public void setBlockNumber(int blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
 	}
 
 	public String getSource() {
