@@ -107,7 +107,7 @@ public class CommunicatorInput implements Runnable {
 			this.dispatcher.setState(State.BDL_LOADED);
 			this.buffer = new StringBuilder();//Clear the buffer
 		} else if(str.startsWith("200 BUNDLE DELIVERED ACCEPTED")) {
-			this.dispatcher.setState(State.BDL_READY);
+			this.dispatcher.setState(State.BDL_DELIVERED);
 		}
 	}
 

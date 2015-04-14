@@ -70,8 +70,10 @@ public class Fetcher implements Runnable {
 			this.bundle.setEncoded(encoded);
 			//Set the bundle to the dispatcher, so the dispatcher can add it in the Fifo for the app
 			this.dispatcher.setFetchingBundle(this.bundle);
+			this.dispatcher.setState(State.BDL_READY);
 			//Request to mark the bundle as delivered so the CommunicatorInput will set the dispatcher's state to BDL_READY
-			this.communicatorOutput.query("bundle delivered " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());			
+			this.communicatorOutput.query("bundle delivered " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());
+			//while(this.dispatcher.getState() != State.BDL_DELIVERED);
 		}
 	}
 

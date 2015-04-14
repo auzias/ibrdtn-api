@@ -100,7 +100,7 @@ public class Dispatcher implements Observer {
 		threadFetcher.start();
 		while(this.getState() != State.BDL_READY);
 		this.receivedBundles.enqueue(this.fetchingBundle);
-
+		while(this.getState() != State.BDL_DELIVERED);
 		if(this.pendingBundle.isEmpty()){
 			this.setState(State.IDLE);
 		} else {
@@ -139,7 +139,8 @@ public class Dispatcher implements Observer {
 		BDL_LOADED(10),		//The Communicator is fetching bundle
 		INFO_BUFFERED(11),
 		PLD_BUFFERED(12),
-		BDL_READY(19);	//The Communicator is buffered info bundle
+		BDL_READY(13),
+		BDL_DELIVERED(14);
 		public final int value;
 
 		State(int value) {
@@ -157,7 +158,8 @@ public class Dispatcher implements Observer {
 			case 10: return "BDL_LOADED";
 			case 11: return "INFO_BUFFERED";
 			case 12: return "PLD_BUFFERED";
-			case 19: return "BDL_READY";
+			case 13: return "BDL_READY";
+			case 14: return "BDL_DELIVERED";
 			default: return "UNKNOWN";
 			}
 		}
