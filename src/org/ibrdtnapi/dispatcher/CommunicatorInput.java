@@ -56,6 +56,9 @@ public class CommunicatorInput implements Runnable {
 					if(str.startsWith("Encoding:"))
 						this.dispatcher.setState(State.INFO_BUFFERED);
 				} else if(this.dispatcher.getState() == State.INFO_BUFFERED){
+					if(str.startsWith("602 NOTIFY BUNDLE")) {
+						this.notifyBundle(str);
+					}
 					if(!str.startsWith("200 BUNDLE LOADED")
 					&& !str.startsWith("200 PAYLOAD GET")) {
 						this.buffer.append(str + "\n");
@@ -99,23 +102,31 @@ public class CommunicatorInput implements Runnable {
 		} else if("200 SWITCHED TO EXTENDED".equals(str)) {
 			this.dispatcher.setState(Dispatcher.State.EXTENDED);
 		} else if("200 OK".equals(str) && this.dispatcher.getState() == State.EXTENDED) {
-			this.dispatcher.setState(Dispatcher.State.EID_SET);
+			this.dispatcher.setState(Dispatcher.State.IDLE);
 		} else if(str.startsWith("602 NOTIFY BUNDLE")) { //i.e.: 602 NOTIFY BUNDLE 482241205 1 dtn://59/wfJQXpkXdWMBWUTv
-			String[] parsed = str.split(" ");
-			long timestamp = Long.parseLong(parsed[3]);
-			int blockNumber = Integer.parseInt(parsed[4]);
-			String source = parsed[5];
-			Bundle bundle = new Bundle(timestamp, blockNumber, source, null);
-			Thread threadFetcherLauncher = new Thread(new FetcherLauncher(bundle, this.toFetchBundles));
-			threadFetcherLauncher.setName("Fetcher Launcher");
-			threadFetcherLauncher.start();
-
-
+			this.notifyBundle(str);
 		} else if(str.startsWith("200 BUNDLE LOADED")) {
 			this.dispatcher.setState(State.BDL_LOADED);
 			this.buffer = new StringBuilder();//Clear the buffer
 		} else if(str.startsWith("200 BUNDLE DELIVERED ACCEPTED")) {
 			this.dispatcher.setState(State.BDL_READY);
+		}
+	}
+
+	private void notifyBundle(String str) {
+		String[] parsed = str.split(" ");
+		long timestamp = Long.parseLong(parsed[3]);
+		int blockNumber = Integer.parseInt(parsed[4]);
+		String source = parsed[5];
+		Bundle bundle = new Bundle(timestamp, blockNumber, source, null);
+
+		if(this.dispatcher.getState() == State.FETCHING) {
+			this.dispatcher.addPendingBundle(bundle);
+		} else {
+			FetcherLauncher fetcherLauncher = FetcherLauncher.getInstance(bundle, this.toFetchBundles, this.dispatcher);
+			Thread threadFetcherLauncher = new Thread(fetcherLauncher);
+			threadFetcherLauncher.setName("Fetcher Launcher");
+			threadFetcherLauncher.start();
 		}
 	}
 }

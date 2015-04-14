@@ -25,6 +25,7 @@ public class Dispatcher implements Observer {
 	private FifoBundleQueue toFetchBundles = null;
 	private FifoBundleQueue receivedBundles = new FifoBundleQueue();
 	private FifoBundleQueue toSendBundles = null;
+	private FifoBundleQueue pendingBundles = new FifoBundleQueue();
 	private CommunicatorInput communicatorInput = null;
 	private CommunicatorOutput communicatorOutput = null;
 	private Socket socket = null;
@@ -78,7 +79,7 @@ public class Dispatcher implements Observer {
 			String query = (eid.contains(Api.NOT_SINGLETON) ? "registration add " : "set endpoint ") + eid + "\n";
 			this.communicatorOutput.query(query);
 		}
-		while(this.getState() != State.EID_SET);
+		while(this.getState() != State.IDLE);
 	}
 
 	@Override
@@ -97,8 +98,19 @@ public class Dispatcher implements Observer {
 		Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
 		threadFetcher.setName("Fetcher Thread");
 		threadFetcher.start();
+
+		if(this.getState() != State.FETCHING)
+			this.setState(State.FETCHING_READY);
+
 		while(this.getState() != State.BDL_READY);
 		this.receivedBundles.enqueue(this.fetchingBundle);
+
+		if(!this.pendingBundles.isEmpty()) {
+			this.setState(State.FETCHING);
+			this.fetch(this.pendingBundles.dequeue());
+		} else {
+			this.setState(State.IDLE);
+		}
 	}
 
 	public FifoBundleQueue getReceivedBundles() {
@@ -115,8 +127,10 @@ public class Dispatcher implements Observer {
 
 	public synchronized void setState(Dispatcher.State state) {
 		Dispatcher.log.fine("Dispatcher State changed from " + this.state);
+		System.out.print("Dispatcher State changed from " + this.state);
 		this.state = state;
 		Dispatcher.log.fine(" to " + this.state);
+		System.out.println(" to " + this.state);
 	}
 
 	public enum State {
@@ -125,7 +139,9 @@ public class Dispatcher implements Observer {
 
 		CONNECTED(0),		//Socket is established with the daemon
 		EXTENDED(1),		//The query 'protocol extended' returned '200 SWITCHED TO EXTENDED'
-		EID_SET(2),
+		IDLE(2),
+		FETCHING(3),
+		FETCHING_READY(4),
 
 		BDL_LOADED(10),		//The Communicator is fetching bundle
 		INFO_BUFFERED(11),
@@ -143,13 +159,19 @@ public class Dispatcher implements Observer {
 			case -1: return "DISCONNECTED";
 			case  0: return "CONNECTED";
 			case  1: return "EXTENDED";
-			case  2: return "EID_SET";
+			case  2: return "IDLE";
+			case  3: return "FETCHING";
+			case  4: return "FETCHING_READY";
 			case 10: return "BDL_LOADED";
 			case 11: return "INFO_BUFFERED";
 			case 12: return "PLD_BUFFERED";
 			case 19: return "BDL_READY";
-			default: return "UNKNOWN";
+			default: return ("UNKNOWN: " + this.value);
 			}
 		}
+	}
+
+	public void addPendingBundle(Bundle bundle) {
+		this.pendingBundles.enqueue(bundle);
 	}
 }

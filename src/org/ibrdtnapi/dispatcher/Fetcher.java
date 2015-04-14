@@ -22,6 +22,8 @@ public class Fetcher implements Runnable {
 	@Override
 	public void run() {
 		Fetcher.log.fine("Fetching started with:" + this.bundle);
+		while(this.dispatcher.getState() != State.IDLE && this.dispatcher.getState() != State.FETCHING_READY);
+		this.dispatcher.setState(State.FETCHING);
 		//Request to load the bundle into the register:
 		this.communicatorOutput.query("bundle load " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());
 		while(this.dispatcher.getState() != State.BDL_LOADED);
@@ -58,10 +60,14 @@ public class Fetcher implements Runnable {
 		buffer = this.communicatorInput.getBuffer();
 		String[] payloadBuffer = buffer.split("\n");
 		int i = 0;
+		int k = 0;
 		for(String s : payloadBuffer) {
+			System.out.println(k +": " + s);
+			k++;
 			if(!s.startsWith("Encoding:"))
 				i++;
 		}
+
 		String encoded = payloadBuffer[i];
 		this.bundle.setEncoded(encoded);
 		//Set the bundle to the dispatcher, so the dispatcher can add it in the Fifo for the app
