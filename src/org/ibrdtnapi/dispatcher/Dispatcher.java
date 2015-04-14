@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Logger;
 
 import org.ibrdtnapi.Api;
 import org.ibrdtnapi.BpApplication;
@@ -19,6 +20,7 @@ import org.ibrdtnapi.entities.Bundle;
 import org.ibrdtnapi.entities.FifoBundleQueue;
 
 public class Dispatcher implements Observer {
+	private static final Logger log = Logger.getLogger(Dispatcher.class.getName());
 	private Dispatcher.State state = State.DISCONNECTED;
 	private FifoBundleQueue toFetchBundles = null;
 	private FifoBundleQueue receivedBundles = new FifoBundleQueue();
@@ -112,9 +114,9 @@ public class Dispatcher implements Observer {
 	}
 
 	public synchronized void setState(Dispatcher.State state) {
-		System.out.print("Dispatcher State changed from " + this.state);
+		Dispatcher.log.fine("Dispatcher State changed from " + this.state);
 		this.state = state;
-		System.out.println(" to " + this.state);
+		Dispatcher.log.fine(" to " + this.state);
 	}
 
 	public enum State {

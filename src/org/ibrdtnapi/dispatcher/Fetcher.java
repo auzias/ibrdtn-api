@@ -22,10 +22,13 @@ public class Fetcher implements Runnable {
 	@Override
 	public void run() {
 		Fetcher.log.fine("Fetching started with:" + this.bundle);
-		this.communicatorOutput.query("bundle load " + this.bundle.getTimestamp() + " " + this.bundle.getBlockNumber() + " " + this.bundle.getSource());
+		//Request to load the bundle into the register:
+		this.communicatorOutput.query("bundle load " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());
 		while(this.dispatcher.getState() != State.BDL_LOADED);
+		//Request to load the meta-data
 		this.communicatorOutput.query("bundle info");
 		while(this.dispatcher.getState() != State.INFO_BUFFERED);
+		//Parse the meta-data
 		String buffer = this.communicatorInput.getBuffer();
 		String[] meta = buffer.split("\n");
 		for(String s : meta) {
@@ -48,14 +51,23 @@ public class Fetcher implements Runnable {
 			else if(s.startsWith("Length:"))
 				this.bundle.setLength(Integer.parseInt(s.split(" ")[1]));
 		}
+		//Request to load the payload (base64 encoded)
 		this.communicatorOutput.query("payload 0 get 0 " + this.bundle.getLength());
 		while(this.dispatcher.getState() != State.PLD_BUFFERED);
-		
+		//Set the encoded payload to the bundle
 		buffer = this.communicatorInput.getBuffer();
-		this.bundle.setEncoded(buffer.split("\n")[4]);
-
+		String[] payloadBuffer = buffer.split("\n");
+		int i = 0;
+		for(String s : payloadBuffer) {
+			if(!s.startsWith("Encoding:"))
+				i++;
+		}
+		String encoded = payloadBuffer[i];
+		this.bundle.setEncoded(encoded);
+		//Set the bundle to the dispatcher, so the dispatcher can add it in the Fifo for the app
 		this.dispatcher.setFetchingBundle(this.bundle);
-		this.dispatcher.setState(State.BDL_READY);
+		//Request to mark the bundle as delivered so the CommunicatorInput will set the dispatcher's state to BDL_READY
+		this.communicatorOutput.query("bundle delivered " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());
 	}
 
 }

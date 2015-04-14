@@ -15,12 +15,11 @@ import sun.misc.BASE64Decoder;
 public class Bundle {
 	private static final Logger log = Logger.getLogger(Bundle.class.getName());
 	private long timestamp;
-	private int blockNumber;
+	private int sequenceNumber;
 	private String source = null;
 	private String destination = null;
 	private int length;
 	private int flags = 0;
-	private int sequencenumber = 0;
 	private String reportto = null;
 	private String custodian = null;
 	private int lifetime = 0;
@@ -33,17 +32,13 @@ public class Bundle {
 
 	public Bundle(long timestamp, int blockNumber, String source, String destination) {
 		this.timestamp = (timestamp == 0) ? System.currentTimeMillis() : timestamp;
-		this.blockNumber = blockNumber;
+		this.sequenceNumber = blockNumber;
 		this.source = source;
 		this.destination = destination;
 	}
 	
 	public long getTimestamp() {
 		return timestamp;
-	}
-
-	public int getBlockNumber() {
-		return blockNumber;
 	}
 
 	public int getFlags() {
@@ -55,11 +50,11 @@ public class Bundle {
 	}
 
 	public int getSequencenumber() {
-		return sequencenumber;
+		return this.sequenceNumber;
 	}
 
-	public void setSequencenumber(int sequencenumber) {
-		this.sequencenumber = sequencenumber;
+	public void setSequencenumber(int sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
 	}
 
 	public String getReportto() {
@@ -91,7 +86,7 @@ public class Bundle {
 	}
 
 	public void setBlockNumber(int blockNumber) {
-		this.blockNumber = blockNumber;
+		this.sequenceNumber = blockNumber;
 	}
 
 	public void setSource(String source) {
