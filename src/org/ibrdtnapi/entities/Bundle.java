@@ -108,8 +108,8 @@ public class Bundle {
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
-		str.append("From " + ((this.source == null) ? "source:none" : this.source));
-		str.append(", to " + ((this.destination == null) ? "destnt:none" : this.destination));
+		str.append("" + ((this.source == null) ? "source:none" : this.source));
+		str.append(" -> " + ((this.destination == null) ? "destnt:none" : this.destination));
 		str.append(" @" + this.timestamp);
 		str.append(", data");
 		str.append("(" + this.length + "):");
