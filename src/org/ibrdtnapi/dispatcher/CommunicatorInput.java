@@ -24,6 +24,7 @@ public class CommunicatorInput implements Runnable {
 	public CommunicatorInput(BufferedReader br, Dispatcher dispatcher) {
 		this.br = br;
 		this.dispatcher = dispatcher;
+		this.dispatcher.setState(State.CONNECTED);
 		this.toFetchBundles.addObserver(this.dispatcher);
 		synchronized(Api.lockFile) {
 			try {
@@ -46,13 +47,19 @@ public class CommunicatorInput implements Runnable {
 		try {
 			while ((str = this.br.readLine()) != null) {
 				this.log(str);
+				this.parse(str);
+				
+				
+				
+				
+				/*
 				if(this.dispatcher.getState() != State.BDL_LOADED) {
-					this.parse(str);
+					
 				} else if(this.dispatcher.getState() == State.BDL_LOADED){
 					this.buffer.append(str + "\n");
 					if(str.startsWith("Encoding:"))
 						this.dispatcher.setState(State.INFO_BUFFERED);
-				}
+				}*/
 			}
 		} catch (IOException e) {
 			throw new DaemonException("Could not read from the socket. " + e.getMessage());
@@ -81,20 +88,24 @@ public class CommunicatorInput implements Runnable {
 	}
 
 	private void parse(String str) {
-		if(str == null) throw new ApiException("Input string null.");
-
-		if("200 SWITCHED TO EXTENDED".equals(str) && this.dispatcher.getState() == Dispatcher.State.CONNECTED)
+		if(str == null) {
+			throw new ApiException("Input string null.");
+		} else if("200 SWITCHED TO EXTENDED".equals(str)) {
 			this.dispatcher.setState(Dispatcher.State.EXTENDED);
-
-		if(str.startsWith("602 NOTIFY BUNDLE")) { //i.e.: 602 NOTIFY BUNDLE 482241205 1 dtn://59/wfJQXpkXdWMBWUTv
+		} else if("200 OK".equals(str) && this.dispatcher.getState() == State.EXTENDED) {
+			this.dispatcher.setState(Dispatcher.State.EID_SET);
+		} else if(str.startsWith("602 NOTIFY BUNDLE")) { //i.e.: 602 NOTIFY BUNDLE 482241205 1 dtn://59/wfJQXpkXdWMBWUTv
 			String[] parsed = str.split(" ");
 			long timestamp = Long.parseLong(parsed[3]);
 			int blockNumber = Integer.parseInt(parsed[4]);
 			String source = parsed[5];
-			this.toFetchBundles.enqueue(new Bundle(timestamp, blockNumber, source, null));
-		}
+			Bundle bundle = new Bundle(timestamp, blockNumber, source, null);
 
-		if(str.startsWith("200 BUNDLE LOADED")) {
+			Thread threadFetcherLauncher = new Thread(new FetcherLauncher(bundle, this.toFetchBundles));
+			threadFetcherLauncher.setName("Fetcher Launcher");
+			threadFetcherLauncher.start();
+		
+		} else if(str.startsWith("200 BUNDLE LOADED")) {
 			this.dispatcher.setState(State.BDL_LOADED);
 			this.buffer = new StringBuilder();//Clear the buffer
 		}

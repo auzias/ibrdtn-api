@@ -41,7 +41,6 @@ public class Dispatcher implements Observer {
 		} catch (Exception e) {
 			throw new DaemonException("Cannot establish connection. Is IBR-DTN daemon running? Is it accessible on 127.0.0.1:" + port + "? " + e.getMessage());
 		}
-		this.setState(State.CONNECTED);
 		
 		//Create CommunicatorInput and Output
 		try {
@@ -52,8 +51,9 @@ public class Dispatcher implements Observer {
 			//The CommunicatorInput has the notification of received bundles. We need to set this Fifo to the dispatcher (observer).
 			this.toFetchBundles = this.communicatorInput.getToFetchBundles();
 			//We start the Thread communicatorInput that will log and parse input. 
-			new Thread(this.communicatorInput).start();
-
+			Thread threadCommInput = new Thread(this.communicatorInput);
+			threadCommInput.setName("CommunicatorInputThread");
+			threadCommInput.start();
 			//Bind the output stream of the socket to a dataOutputStream.
 			DataOutputStream dos = new DataOutputStream(this.socket.getOutputStream());
 			this.communicatorOutput = new CommunicatorOutput(dos);
@@ -66,6 +66,7 @@ public class Dispatcher implements Observer {
 	}
 
 	private void initEndpoint(String eid) {
+		while(this.getState() != State.CONNECTED);
 		this.communicatorOutput.query("protocol extended");
 		//Wait for confirmation
 		while(this.getState() != State.EXTENDED && this.getState() != State.ERROR);
@@ -75,6 +76,7 @@ public class Dispatcher implements Observer {
 			String query = (eid.contains(Api.NOT_SINGLETON) ? "registration add " : "set endpoint ") + eid + "\n";
 			this.communicatorOutput.query(query);
 		}
+		while(this.getState() != State.EID_SET);
 	}
 
 	@Override
@@ -83,7 +85,6 @@ public class Dispatcher implements Observer {
 			//TODO: send the bundle
 			System.out.println("Bundle to send:" + this.toSendBundles.dequeue());
 		} else if(this.toFetchBundles == obs) {
-			//TODO: fetch the bundle and add it in receivedBundles
 			this.fetch(this.toFetchBundles.dequeue());
 		} else {
 			System.err.println("An error occured on Dispatcher::update.");
@@ -91,7 +92,9 @@ public class Dispatcher implements Observer {
 	}
 
 	private void fetch(Bundle bundle) {
-		new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle)).start();
+		Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
+		threadFetcher.setName("Fetcher Thread");
+		threadFetcher.start();
 		while(this.getState() != State.BDL_READY);
 		this.receivedBundles.enqueue(this.fetchingBundle);
 	}
@@ -109,23 +112,42 @@ public class Dispatcher implements Observer {
 	}
 
 	public synchronized void setState(Dispatcher.State state) {
+		System.out.print("Dispatcher State changed from " + this.state);
 		this.state = state;
+		System.out.println(" to " + this.state);
 	}
 
 	public enum State {
 		ERROR(-2),			//An error occurred
 		DISCONNECTED(-1),	//Socket is not yet established
+
 		CONNECTED(0),		//Socket is established with the daemon
 		EXTENDED(1),		//The query 'protocol extended' returned '200 SWITCHED TO EXTENDED'
-		SENDING(2),			//The Communicator is sending bundle 
-		BDL_LOADED(3),		//The Communicator is fetching bundle
-		BDL_FETCHED(4),		//The Communicator is fetching bundle
-		BDL_READY(5),
-		INFO_BUFFERED(6), PLD_BUFFERED(7);	//The Communicator is buffered info bundle
+		EID_SET(2),
+
+		BDL_LOADED(10),		//The Communicator is fetching bundle
+		INFO_BUFFERED(11),
+		PLD_BUFFERED(12),
+		BDL_READY(19);	//The Communicator is buffered info bundle
 		public final int value;
 
 		State(int value) {
 			this.value = value;
+		}
+
+		public String toString() {
+			switch (this.value) {
+			case -2: return "ERROR";
+			case -1: return "DISCONNECTED";
+			case  0: return "CONNECTED";
+			case  1: return "EXTENDED";
+			case  2: return "EID_SET";
+			case 10: return "BDL_LOADED";
+			case 11: return "INFO_BUFFERED";
+			case 12: return "PLD_BUFFERED";
+			case 19: return "BDL_READY";
+			default: return "UNKNOWN";
+			}
 		}
 	}
 }
