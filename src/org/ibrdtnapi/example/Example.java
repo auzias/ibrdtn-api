@@ -4,7 +4,12 @@
  */
 package org.ibrdtnapi.example;
 
+import java.io.IOException;
+
 import org.ibrdtnapi.entities.Bundle;
+
+import sun.misc.BASE64Decoder;
+
 
 public class Example {
 

@@ -45,21 +45,22 @@ public class CommunicatorInput implements Runnable {
 	public void run() {
 		String str;
 		try {
+			int lineCount = 0;
 			while ((str = this.br.readLine()) != null) {
 				this.log(str);
-				this.parse(str);
-				
-				
-				
-				
-				/*
-				if(this.dispatcher.getState() != State.BDL_LOADED) {
-					
+				if(this.dispatcher.getState() != State.BDL_LOADED
+				&& this.dispatcher.getState() != State.INFO_BUFFERED) {
+					this.parse(str);
 				} else if(this.dispatcher.getState() == State.BDL_LOADED){
 					this.buffer.append(str + "\n");
 					if(str.startsWith("Encoding:"))
 						this.dispatcher.setState(State.INFO_BUFFERED);
-				}*/
+				} else if(this.dispatcher.getState() == State.INFO_BUFFERED){
+					this.buffer.append(str + "\n");
+					lineCount++;
+					if(lineCount >= 7)
+						this.dispatcher.setState(State.PLD_BUFFERED);
+				}
 			}
 		} catch (IOException e) {
 			throw new DaemonException("Could not read from the socket. " + e.getMessage());
@@ -100,11 +101,11 @@ public class CommunicatorInput implements Runnable {
 			int blockNumber = Integer.parseInt(parsed[4]);
 			String source = parsed[5];
 			Bundle bundle = new Bundle(timestamp, blockNumber, source, null);
-
 			Thread threadFetcherLauncher = new Thread(new FetcherLauncher(bundle, this.toFetchBundles));
 			threadFetcherLauncher.setName("Fetcher Launcher");
 			threadFetcherLauncher.start();
-		
+
+
 		} else if(str.startsWith("200 BUNDLE LOADED")) {
 			this.dispatcher.setState(State.BDL_LOADED);
 			this.buffer = new StringBuilder();//Clear the buffer
