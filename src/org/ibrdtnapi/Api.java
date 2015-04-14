@@ -10,4 +10,5 @@ public class Api {
 	public static final boolean APPEND = true;
 	public static FileWriter logFile = null;
 	public static Object lockFile = new Object();
+	public static Object lockFetcher = new Object();
 }
