@@ -24,7 +24,6 @@ public class Dispatcher implements Observer {
 	private Dispatcher.State state = State.DISCONNECTED;
 	private FifoBundleQueue toFetchBundles = null;
 	private FifoBundleQueue receivedBundles = new FifoBundleQueue();
-	private FifoBundleQueue pendingBundle = new FifoBundleQueue();
 	private FifoBundleQueue toSendBundles = null;
 	private CommunicatorInput communicatorInput = null;
 	private CommunicatorOutput communicatorOutput = null;
@@ -87,26 +86,26 @@ public class Dispatcher implements Observer {
 		if(this.toSendBundles == obs) {
 			//TODO: send the bundle
 			System.out.println("Bundle to send:" + this.toSendBundles.dequeue());
-		} else if(this.toFetchBundles == obs) {
+		} else if(!this.toFetchBundles.isEmpty()) {
 			this.fetch(this.toFetchBundles.dequeue());
 		} else {
 			System.err.println("An error occured on Dispatcher::update.");
 		}
 	}
 
-	private void fetch(Bundle bundle) {
-		Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
-		threadFetcher.setName("Fetcher Thread");
-		threadFetcher.start();
-		while(this.getState() != State.BDL_READY);
-		this.receivedBundles.enqueue(this.fetchingBundle);
-		while(this.getState() != State.BDL_DELIVERED);
-		if(this.pendingBundle.isEmpty()){
+	private synchronized void fetch(Bundle bundle) {
+		//Wait to be ready to fetch next bundle
+		while(this.getState() != State.IDLE);
+		//Fetch all bundle
+		do{
+			Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
+			threadFetcher.setName("Fetcher Thread");
+			threadFetcher.start();
+			while(this.getState() != State.BDL_READY && this.getState() != State.BDL_DELIVERED);
+			this.receivedBundles.enqueue(this.fetchingBundle);
+			while(this.getState() != State.BDL_DELIVERED);
 			this.setState(State.IDLE);
-		} else {
-			this.fetch(this.pendingBundle.dequeue());
-		}
-		
+		}while(!this.toFetchBundles.isEmpty());
 	}
 
 	public FifoBundleQueue getReceivedBundles() {
@@ -117,14 +116,20 @@ public class Dispatcher implements Observer {
 		this.fetchingBundle = fetchingBundle;
 	}
 
-	public synchronized Dispatcher.State getState() {
-		return state;
+	public Dispatcher.State getState() {
+		synchronized(this.state) {
+			return state;
+		}
 	}
 
-	public synchronized void setState(Dispatcher.State state) {
-		Dispatcher.log.fine("Dispatcher State changed from " + this.state);
-		this.state = state;
-		Dispatcher.log.fine(" to " + this.state);
+	public void setState(Dispatcher.State state) {
+		synchronized(this.state){
+			Dispatcher.log.fine("Dispatcher State changed from " + this.state);
+//System.out.print("Dispatcher State changed from " + this.state);
+			this.state = state;
+			Dispatcher.log.fine(" to " + this.state);
+//System.out.println(" to " + this.state);
+		}
 	}
 
 	public enum State {
@@ -163,9 +168,5 @@ public class Dispatcher implements Observer {
 			default: return "UNKNOWN";
 			}
 		}
-	}
-
-	public void addPendingBundle(Bundle bundle) {
-		this.pendingBundle.enqueue(bundle);
 	}
 }

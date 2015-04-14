@@ -112,15 +112,9 @@ public class CommunicatorInput implements Runnable {
 	}
 
 	private void notifyBundle(String str) {
-		
-		if(this.dispatcher.getState() == State.IDLE) {
-			this.dispatcher.setState(State.FETCHING);
-			Thread threadFetcherLauncher = new Thread(new FetcherLauncher(this.bundleNotified(str), this.toFetchBundles));
-			threadFetcherLauncher.setName("Fetcher Launcher");
-			threadFetcherLauncher.start();
-		} else {
-			this.dispatcher.addPendingBundle(this.bundleNotified(str));
-		}
+		Thread fetcherLauncher = new Thread(new FetcherLauncher(this.bundleNotified(str), this.toFetchBundles));
+		fetcherLauncher.setName("Fetcher launcher");
+		fetcherLauncher.start();
 	}
 
 	private Bundle bundleNotified(String str) {
