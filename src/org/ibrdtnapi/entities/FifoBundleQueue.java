@@ -13,7 +13,7 @@ public class FifoBundleQueue extends Observable {
 	public FifoBundleQueue() {
 	}
 
-	public boolean enqueue(Bundle bundle) {
+	public synchronized boolean enqueue(Bundle bundle) {
 		if(bundle == null) return false;
 		boolean ret = this.bundles.add(bundle);
 		if(ret) {
@@ -23,11 +23,11 @@ public class FifoBundleQueue extends Observable {
 		return ret;
 	}
 
-	public Bundle dequeue() {
+	public synchronized Bundle dequeue() {
 		return this.bundles.poll();
 	}
 
-	public boolean isEmpty() {
+	public synchronized boolean isEmpty() {
 		return this.bundles.isEmpty();
 	}
 }

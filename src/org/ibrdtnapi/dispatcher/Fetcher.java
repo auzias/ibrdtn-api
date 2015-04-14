@@ -73,7 +73,6 @@ public class Fetcher implements Runnable {
 			this.dispatcher.setState(State.BDL_READY);
 			//Request to mark the bundle as delivered so the CommunicatorInput will set the dispatcher's state to BDL_READY
 			this.communicatorOutput.query("bundle delivered " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());
-			//while(this.dispatcher.getState() != State.BDL_DELIVERED);
 		}
 	}
 
