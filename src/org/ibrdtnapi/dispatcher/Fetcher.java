@@ -14,10 +14,12 @@ public class Fetcher implements Runnable {
 	private Bundle bundle = null;
 
 	public Fetcher(Dispatcher dispatcher,CommunicatorOutput communicatorOutput, CommunicatorInput communicatorInput, Bundle bundle) {
-		this.communicatorOutput = communicatorOutput;
-		this.communicatorInput = communicatorInput;
-		this.dispatcher = dispatcher;
-		this.bundle = bundle;
+		synchronized(Api.lockFetcher) {
+			this.communicatorOutput = communicatorOutput;
+			this.communicatorInput = communicatorInput;
+			this.dispatcher = dispatcher;
+			this.bundle = bundle;
+		}
 	}
 
 	@Override

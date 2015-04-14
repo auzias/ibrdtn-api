@@ -24,6 +24,7 @@ public class Dispatcher implements Observer {
 	private Dispatcher.State state = State.DISCONNECTED;
 	private FifoBundleQueue toFetchBundles = null;
 	private FifoBundleQueue receivedBundles = new FifoBundleQueue();
+	private FifoBundleQueue pendingBundle = new FifoBundleQueue();
 	private FifoBundleQueue toSendBundles = null;
 	private CommunicatorInput communicatorInput = null;
 	private CommunicatorOutput communicatorOutput = null;
@@ -78,7 +79,7 @@ public class Dispatcher implements Observer {
 			String query = (eid.contains(Api.NOT_SINGLETON) ? "registration add " : "set endpoint ") + eid + "\n";
 			this.communicatorOutput.query(query);
 		}
-		while(this.getState() != State.EID_SET);
+		while(this.getState() != State.IDLE);
 	}
 
 	@Override
@@ -99,6 +100,13 @@ public class Dispatcher implements Observer {
 		threadFetcher.start();
 		while(this.getState() != State.BDL_READY);
 		this.receivedBundles.enqueue(this.fetchingBundle);
+
+		if(this.pendingBundle.isEmpty()){
+			this.setState(State.IDLE);
+		} else {
+			this.fetch(this.pendingBundle.dequeue());
+		}
+		
 	}
 
 	public FifoBundleQueue getReceivedBundles() {
@@ -125,7 +133,8 @@ public class Dispatcher implements Observer {
 
 		CONNECTED(0),		//Socket is established with the daemon
 		EXTENDED(1),		//The query 'protocol extended' returned '200 SWITCHED TO EXTENDED'
-		EID_SET(2),
+		IDLE(2),
+		FETCHING(3),
 
 		BDL_LOADED(10),		//The Communicator is fetching bundle
 		INFO_BUFFERED(11),
@@ -143,7 +152,8 @@ public class Dispatcher implements Observer {
 			case -1: return "DISCONNECTED";
 			case  0: return "CONNECTED";
 			case  1: return "EXTENDED";
-			case  2: return "EID_SET";
+			case  2: return "IDLE";
+			case  3: return "FETCHING";
 			case 10: return "BDL_LOADED";
 			case 11: return "INFO_BUFFERED";
 			case 12: return "PLD_BUFFERED";
@@ -151,5 +161,9 @@ public class Dispatcher implements Observer {
 			default: return "UNKNOWN";
 			}
 		}
+	}
+
+	public void addPendingBundle(Bundle bundle) {
+		this.pendingBundle.enqueue(bundle);
 	}
 }
