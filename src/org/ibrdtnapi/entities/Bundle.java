@@ -6,7 +6,9 @@ package org.ibrdtnapi.entities;
 
 import java.io.IOException;
 import java.util.logging.Logger;
+
 import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 /**
  * The class Bundle represent bundle with ONLY ONE SINGLE BLOCK.  
@@ -35,6 +37,12 @@ public class Bundle {
 		this.sequenceNumber = blockNumber;
 		this.source = source;
 		this.destination = destination;
+	}
+
+
+	public Bundle(String destination, String payloadDecoded) {
+		this.destination = destination;
+		this.setDecoded(payloadDecoded);
 	}
 	
 	public long getTimestamp() {
@@ -116,7 +124,7 @@ public class Bundle {
 		if(this.encoded != null)
 			str.append("" + this.encoded);
 		if(this.decoded != null)
-			str.append("#" + this.decoded + "#");
+			str.append("#" + this.decoded.trim() + "#");
 
 		return str.toString();
 	}
@@ -136,5 +144,10 @@ public class Bundle {
 		} catch (IOException e) {
 			Bundle.log.warning("Could not base64::decode() the payload of the bundle:" + this + ". " + e.getMessage());
 		}
+	}
+
+	public void setDecoded(String decoded) {
+		this.decoded  = new String(decoded);
+		this.encoded = new String(new BASE64Encoder().encodeBuffer(this.decoded.getBytes())).trim();
 	}
 }
