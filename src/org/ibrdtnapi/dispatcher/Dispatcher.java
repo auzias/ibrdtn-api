@@ -93,7 +93,7 @@ public class Dispatcher implements Observer {
 		}
 	}
 
-	private void send(Bundle bundle) {
+	private synchronized void send(Bundle bundle) {
 		//Wait to be ready to send next bundle
 		while(this.getState() != State.IDLE);
 		do{
