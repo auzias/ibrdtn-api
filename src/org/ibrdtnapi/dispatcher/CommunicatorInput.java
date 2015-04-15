@@ -111,6 +111,12 @@ public class CommunicatorInput implements Runnable {
 			this.buffer = new StringBuilder();//Clear the buffer
 		} else if(str.startsWith("200 BUNDLE DELIVERED ACCEPTED")) {
 			this.dispatcher.setState(State.BDL_DELIVERED);
+		} else if(str.startsWith("100 PUT BUNDLE PLAIN")) {
+			this.dispatcher.setState(State.PUTTING);
+		} else if(str.startsWith("200 BUNDLE IN REGISTER")) {
+			this.dispatcher.setState(State.BDL_REGISTERED);
+		} else if(str.startsWith("200 BUNDLE SENT")) {
+			this.dispatcher.setState(State.BDL_SENT);
 		}
 	}
 

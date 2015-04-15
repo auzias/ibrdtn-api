@@ -11,6 +11,6 @@ public class Example {
 	public static void main(String[] args) {
         BpAppPrinting bpApp = new BpAppPrinting("azee");
         Bundle bundle = new Bundle("dtn://59/rcp", "That's my payload!");
-        bpApp.send(bundle);
+        //bpApp.send(bundle);
 	}
 }

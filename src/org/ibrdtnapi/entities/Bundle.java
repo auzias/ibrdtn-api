@@ -39,7 +39,6 @@ public class Bundle {
 		this.destination = destination;
 	}
 
-
 	public Bundle(String destination, String payloadDecoded) {
 		this.destination = destination;
 		this.setDecoded(payloadDecoded);
@@ -149,5 +148,13 @@ public class Bundle {
 	public void setDecoded(String decoded) {
 		this.decoded  = new String(decoded);
 		this.encoded = new String(new BASE64Encoder().encodeBuffer(this.decoded.getBytes())).trim();
+	}
+
+	public int getDataLength() {
+		return this.decoded.length();
+	}
+
+	public String getEncoded() {
+		return this.encoded;
 	}
 }
