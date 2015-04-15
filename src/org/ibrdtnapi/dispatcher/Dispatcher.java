@@ -85,13 +85,24 @@ public class Dispatcher implements Observer {
 	@Override
 	public void update(Observable obs, Object o) {
 		if(this.toSendBundles == obs) {
-			//TODO: send the bundle
-			System.out.println("Bundle to send:" + this.toSendBundles.dequeue());
+			this.send(this.toSendBundles.dequeue());
 		} else if(!this.toFetchBundles.isEmpty()) {
 			this.fetch(this.toFetchBundles.dequeue());
 		} else {
 			System.err.println("An error occured on Dispatcher::update.");
 		}
+	}
+
+	private void send(Bundle bundle) {
+		//Wait to be ready to send next bundle
+		while(this.getState() != State.IDLE);
+		do{
+			Thread threadSender = new Thread(new Sender(this, this.communicatorOutput, this.communicatorInput, bundle));
+			threadSender.setName("Sender Thread");
+			threadSender.start();
+			while(this.getState() != State.BDL_SENT);
+		}while(!this.toSendBundles.isEmpty());
+		this.setState(State.IDLE);
 	}
 
 	private synchronized void fetch(Bundle bundle) {
@@ -145,7 +156,12 @@ public class Dispatcher implements Observer {
 		INFO_BUFFERED(11),
 		PLD_BUFFERED(12),
 		BDL_READY(13),
-		BDL_DELIVERED(14);
+		BDL_DELIVERED(14),
+		
+		SENDING(20),
+		PUTTING(21),
+		BDL_REGISTERED(22),
+		BDL_SENT(23);
 		public final int value;
 
 		State(int value) {

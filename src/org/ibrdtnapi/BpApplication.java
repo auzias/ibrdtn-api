@@ -22,8 +22,8 @@ public abstract class BpApplication implements Observer {
 		this.receivedBundles = dispatcher.getReceivedBundles();
 	}
 
-	public boolean send(Bundle b) {
-		return this.toSendBundles.enqueue(b);
+	public boolean send(Bundle bundle) {
+		return this.toSendBundles.enqueue(bundle);
 	}
 	
 	@Override
