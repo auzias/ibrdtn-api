@@ -48,13 +48,16 @@ public class CommunicatorInput implements Runnable {
 			int lineCount = 0;
 			while ((str = this.br.readLine()) != null) {
 				this.log(str);
-				if(this.dispatcher.getState() != State.BDL_LOADED
-				&& this.dispatcher.getState() != State.INFO_BUFFERED) {
+				
+				//First thing first, we check if it's a 602 notify
+				if(str.startsWith("602 NOTIFY BUNDLE")) {
+					this.notifyBundle(str);
+				} else if(this.dispatcher.getState() != State.BDL_LOADED
+					   && this.dispatcher.getState() != State.INFO_BUFFERED) {
 					this.parse(str);
-				} else if(this.dispatcher.getState() == State.BDL_LOADED){
+				}  else if(this.dispatcher.getState() == State.BDL_LOADED) {
 					this.buffer.append(str + "\n");
-					if(str.startsWith("Encoding:"))
-						this.dispatcher.setState(State.INFO_BUFFERED);
+					if(str.startsWith("Encoding:"))	this.dispatcher.setState(State.INFO_BUFFERED);
 				} else if(this.dispatcher.getState() == State.INFO_BUFFERED){
 					if(str.startsWith("602 NOTIFY BUNDLE")) {
 						this.notifyBundle(str);
@@ -103,30 +106,26 @@ public class CommunicatorInput implements Runnable {
 			this.dispatcher.setState(Dispatcher.State.EXTENDED);
 		} else if("200 OK".equals(str) && this.dispatcher.getState() == State.EXTENDED) {
 			this.dispatcher.setState(Dispatcher.State.IDLE);
-		} else if(str.startsWith("602 NOTIFY BUNDLE")) { //i.e.: 602 NOTIFY BUNDLE 482241205 1 dtn://59/wfJQXpkXdWMBWUTv
-			this.notifyBundle(str);
 		} else if(str.startsWith("200 BUNDLE LOADED")) {
 			this.dispatcher.setState(State.BDL_LOADED);
 			this.buffer = new StringBuilder();//Clear the buffer
 		} else if(str.startsWith("200 BUNDLE DELIVERED ACCEPTED")) {
-			this.dispatcher.setState(State.BDL_READY);
+			this.dispatcher.setState(State.BDL_DELIVERED);
 		}
 	}
 
 	private void notifyBundle(String str) {
+		Thread fetcherLauncher = new Thread(new FetcherLauncher(this.bundleNotified(str), this.toFetchBundles));
+		fetcherLauncher.setName("Fetcher launcher");
+		fetcherLauncher.start();
+	}
+
+	private Bundle bundleNotified(String str) {
 		String[] parsed = str.split(" ");
 		long timestamp = Long.parseLong(parsed[3]);
 		int blockNumber = Integer.parseInt(parsed[4]);
 		String source = parsed[5];
 		Bundle bundle = new Bundle(timestamp, blockNumber, source, null);
-
-		if(this.dispatcher.getState() == State.FETCHING) {
-			this.dispatcher.addPendingBundle(bundle);
-		} else {
-			FetcherLauncher fetcherLauncher = FetcherLauncher.getInstance(bundle, this.toFetchBundles, this.dispatcher);
-			Thread threadFetcherLauncher = new Thread(fetcherLauncher);
-			threadFetcherLauncher.setName("Fetcher Launcher");
-			threadFetcherLauncher.start();
-		}
+		return bundle;
 	}
 }

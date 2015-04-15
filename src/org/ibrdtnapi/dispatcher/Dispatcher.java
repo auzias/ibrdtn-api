@@ -87,30 +87,26 @@ public class Dispatcher implements Observer {
 		if(this.toSendBundles == obs) {
 			//TODO: send the bundle
 			System.out.println("Bundle to send:" + this.toSendBundles.dequeue());
-		} else if(this.toFetchBundles == obs) {
+		} else if(!this.toFetchBundles.isEmpty()) {
 			this.fetch(this.toFetchBundles.dequeue());
 		} else {
 			System.err.println("An error occured on Dispatcher::update.");
 		}
 	}
 
-	private void fetch(Bundle bundle) {
-		Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
-		threadFetcher.setName("Fetcher Thread");
-		threadFetcher.start();
-
-		if(this.getState() != State.FETCHING)
-			this.setState(State.FETCHING_READY);
-
-		while(this.getState() != State.BDL_READY);
-		this.receivedBundles.enqueue(this.fetchingBundle);
-
-		if(!this.pendingBundles.isEmpty()) {
-			this.setState(State.FETCHING);
-			this.fetch(this.pendingBundles.dequeue());
-		} else {
+	private synchronized void fetch(Bundle bundle) {
+		//Wait to be ready to fetch next bundle
+		while(this.getState() != State.IDLE);
+		//Fetch all bundle
+		do{
+			Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
+			threadFetcher.setName("Fetcher Thread");
+			threadFetcher.start();
+			while(this.getState() != State.BDL_READY && this.getState() != State.BDL_DELIVERED);
+			this.receivedBundles.enqueue(this.fetchingBundle);
+			while(this.getState() != State.BDL_DELIVERED);
 			this.setState(State.IDLE);
-		}
+		}while(!this.toFetchBundles.isEmpty());
 	}
 
 	public FifoBundleQueue getReceivedBundles() {
@@ -121,16 +117,18 @@ public class Dispatcher implements Observer {
 		this.fetchingBundle = fetchingBundle;
 	}
 
-	public synchronized Dispatcher.State getState() {
-		return state;
+	public Dispatcher.State getState() {
+		synchronized(this.state) {
+			return state;
+		}
 	}
 
-	public synchronized void setState(Dispatcher.State state) {
-		Dispatcher.log.fine("Dispatcher State changed from " + this.state);
-		System.out.print("Dispatcher State changed from " + this.state);
-		this.state = state;
-		Dispatcher.log.fine(" to " + this.state);
-		System.out.println(" to " + this.state);
+	public void setState(Dispatcher.State state) {
+		synchronized(this.state){
+			Dispatcher.log.fine("Dispatcher State changed from " + this.state);
+			this.state = state;
+			Dispatcher.log.fine(" to " + this.state);
+		}
 	}
 
 	public enum State {
@@ -146,7 +144,8 @@ public class Dispatcher implements Observer {
 		BDL_LOADED(10),		//The Communicator is fetching bundle
 		INFO_BUFFERED(11),
 		PLD_BUFFERED(12),
-		BDL_READY(19);	//The Communicator is buffered info bundle
+		BDL_READY(13),
+		BDL_DELIVERED(14);
 		public final int value;
 
 		State(int value) {
