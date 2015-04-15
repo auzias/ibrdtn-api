@@ -7,12 +7,23 @@ import java.util.logging.Logger;
 
 import org.ibrdtnapi.Api;
 import org.ibrdtnapi.ApiException;
-import org.ibrdtnapi.DaemonException;
 import org.ibrdtnapi.dispatcher.Dispatcher.State;
 import org.ibrdtnapi.entities.Bundle;
 import org.ibrdtnapi.entities.FifoBundleQueue;
 
-
+/**
+ * 
+ * The input stream from the socket with the daemon
+ * is processed by this class.
+ * It log everything, by default (hard-coded) in a file.
+ * If the file cannot be open, it logs in the ... log at
+ * (info-level).
+ * 
+ * This class, among others, changes the state of the
+ * {@link Dispatcher}. All return-codes from the daemon
+ * are received by the {@link CommunicatorInput}. 
+ *
+ */
 public class CommunicatorInput implements Runnable {
 	private static final Logger log = Logger.getLogger(CommunicatorInput.class.getName());
 	private BufferedReader br = null;
@@ -74,7 +85,7 @@ public class CommunicatorInput implements Runnable {
 				}
 			}
 		} catch (IOException e) {
-			throw new DaemonException("Could not read from the socket. " + e.getMessage());
+			throw new ApiException("Could not read from the socket. " + e.getMessage());
 		}
 		CommunicatorInput.log.severe("Input from the daemon aborted!");
 	}

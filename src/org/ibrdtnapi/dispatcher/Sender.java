@@ -6,17 +6,23 @@ import org.ibrdtnapi.Api;
 import org.ibrdtnapi.dispatcher.Dispatcher.State;
 import org.ibrdtnapi.entities.Bundle;
 
+/**
+ * 
+ * This class is used to send bundle.
+ * It sends only bundle with a single block.
+ * 
+ * It is launched by {@link Dispatcher}.
+ *
+ */
 public class Sender implements Runnable {
 	private static final Logger log = Logger.getLogger(Sender.class.getName());
 	private CommunicatorOutput communicatorOutput = null;
-	private CommunicatorInput communicatorInput = null;
 	private Dispatcher dispatcher = null;
 	private Bundle bundle = null;
 
-	public Sender(Dispatcher dispatcher, CommunicatorOutput communicatorOutput,	CommunicatorInput communicatorInput, Bundle bundle) {
+	public Sender(Dispatcher dispatcher, CommunicatorOutput communicatorOutput,	Bundle bundle) {
 		synchronized(Api.lockSender) {
 			this.communicatorOutput = communicatorOutput;
-			this.communicatorInput = communicatorInput;
 			this.dispatcher = dispatcher;
 			this.bundle = bundle;
 		}

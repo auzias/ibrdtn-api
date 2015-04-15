@@ -6,6 +6,18 @@ import org.ibrdtnapi.Api;
 import org.ibrdtnapi.dispatcher.Dispatcher.State;
 import org.ibrdtnapi.entities.Bundle;
 
+/**
+ * 
+ * This class is used to fetch (download) bundles
+ * from the daemon. {@link Dispatcher} launch it
+ * each time the {@link CommunicatorInput} notifies
+ * a new bundle.
+ * 
+ * Note that all bundle received are required to have
+ * only one single block. Otherwise the behavior may
+ * differ (or crash depending on your luck).
+ *
+ */
 public class Fetcher implements Runnable {
 	private static final Logger log = Logger.getLogger(Fetcher.class.getName());
 	private CommunicatorOutput communicatorOutput = null;

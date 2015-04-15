@@ -7,6 +7,17 @@ package org.ibrdtnapi.entities;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.ibrdtnapi.BpApplication;
+import org.ibrdtnapi.dispatcher.Dispatcher;
+
+/**
+ * 
+ * The Fifo is used to communicate between the
+ * {@link Dispatcher} and the {@link BpApplication}
+ * to send bundles to each other. One way for the
+ * received bundles, the other way for the bundle to send.
+ *
+ */
 public class FifoBundleQueue extends Observable {
 	private ConcurrentLinkedQueue<Bundle> bundles = new ConcurrentLinkedQueue<Bundle>();
 

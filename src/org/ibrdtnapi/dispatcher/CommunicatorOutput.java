@@ -6,9 +6,17 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.ibrdtnapi.Api;
-import org.ibrdtnapi.DaemonException;
+import org.ibrdtnapi.ApiException;
 import org.ibrdtnapi.entities.Bundle;
 
+/**
+ * 
+ * This class is used to send commands to the daemon.
+ * 
+ * See the comment for {@link CommunicatorInput}
+ * to learn about how the log are done, it's the same.
+ * 
+ */
 public class CommunicatorOutput {
 	private static final Logger log = Logger.getLogger(CommunicatorOutput.class.getName());
 	private DataOutputStream dos = null;
@@ -25,7 +33,7 @@ public class CommunicatorOutput {
 			this.dos.write(str.getBytes());
 			this.dos.flush();
 		} catch (IOException e) {
-			throw new DaemonException("Could not write to the scoket. " + e.getMessage());
+			throw new ApiException("Could not write to the scoket. " + e.getMessage());
 		}
 	}
 

@@ -11,6 +11,22 @@ import org.ibrdtnapi.dispatcher.Dispatcher;
 import org.ibrdtnapi.entities.Bundle;
 import org.ibrdtnapi.entities.FifoBundleQueue;
 
+
+/**
+ * 
+ * To create an BpApp you will have to
+ * extend this class and override "bundleReceived()".
+ * 
+ * To create a BpApp you need to choose an endpoint (name).
+ * If your local node is name "dtn://localnode" and you want
+ * the application to have an EID of "dtn://localnode/MyAppEID"
+ * create the BpApp as it:
+ * <code>
+ * 		MyApp myApp = new MyApp("MyAppEID");
+ * </code>
+ * where MyApp is a class extending BpApplication.
+ *
+ */
 public abstract class BpApplication implements Observer {
 	private FifoBundleQueue receivedBundles = null;
 	private FifoBundleQueue toSendBundles = new FifoBundleQueue();

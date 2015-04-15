@@ -15,10 +15,28 @@ import java.util.logging.Logger;
 
 import org.ibrdtnapi.Api;
 import org.ibrdtnapi.BpApplication;
-import org.ibrdtnapi.DaemonException;
+import org.ibrdtnapi.ApiException;
 import org.ibrdtnapi.entities.Bundle;
 import org.ibrdtnapi.entities.FifoBundleQueue;
 
+
+/**
+ * 
+ * The {@link Dispatcher} process bundles to download
+ * (from the daemon) and bundles to send. 
+ * It manages all the communication with the daemon to
+ * ease the {@link BpApplication} usage.
+ * 
+ * Due to the shared-nature of the socket (to send *and*
+ * receive bundles) some states has been defined to fetch
+ * xor send bundles only if the dispatcher is idle. If the
+ * {@link Dispatcher} tries to send a bundle while downloading
+ * one, the commands would mix-up and the return-codes from
+ * the daemon would be too messy to treat.
+ * 
+ * Anyway, it's fast enough, and no deadlock (as far as I tested it).
+ *
+ */
 public class Dispatcher implements Observer {
 	private static final Logger log = Logger.getLogger(Dispatcher.class.getName());
 	private Dispatcher.State state = State.DISCONNECTED;
@@ -42,7 +60,7 @@ public class Dispatcher implements Observer {
 		try {
 			this.socket = new Socket("127.0.0.1", port);
 		} catch (Exception e) {
-			throw new DaemonException("Cannot establish connection. Is IBR-DTN daemon running? Is it accessible on 127.0.0.1:" + port + "? " + e.getMessage());
+			throw new ApiException("Cannot establish connection. Is IBR-DTN daemon running? Is it accessible on 127.0.0.1:" + port + "? " + e.getMessage());
 		}
 		
 		//Create CommunicatorInput and Output
@@ -61,7 +79,7 @@ public class Dispatcher implements Observer {
 			DataOutputStream dos = new DataOutputStream(this.socket.getOutputStream());
 			this.communicatorOutput = new CommunicatorOutput(dos);
 		} catch (IOException e) {
-			throw new DaemonException("Could not set the bufferReader or the DataOutputStream. " + e.getMessage());
+			throw new ApiException("Could not set the bufferReader or the DataOutputStream. " + e.getMessage());
 		}
 
 		//Once the connection is established with the daemon, we initiate the protocol extended to receive/send bundles
@@ -73,7 +91,7 @@ public class Dispatcher implements Observer {
 		this.communicatorOutput.query("protocol extended");
 		//Wait for confirmation
 		while(this.getState() != State.EXTENDED && this.getState() != State.ERROR);
-		if(this.getState() == State.ERROR) throw new DaemonException("Could not initiate the extended protocol.");
+		if(this.getState() == State.ERROR) throw new ApiException("Could not initiate the extended protocol.");
 		//If protocol extended is initiated we set an endpoint (if it's a singleton) xor add a registration (if it's not a singleton -and the EID is a group EID-)
 		if(this.getState() == State.EXTENDED) {
 			String query = (eid.contains(Api.NOT_SINGLETON) ? "registration add " : "set endpoint ") + eid + "\n";
@@ -97,7 +115,7 @@ public class Dispatcher implements Observer {
 		//Wait to be ready to send next bundle
 		while(this.getState() != State.IDLE);
 		do{
-			Thread threadSender = new Thread(new Sender(this, this.communicatorOutput, this.communicatorInput, bundle));
+			Thread threadSender = new Thread(new Sender(this, this.communicatorOutput, bundle));
 			threadSender.setName("Sender Thread");
 			threadSender.start();
 			while(this.getState() != State.BDL_SENT);

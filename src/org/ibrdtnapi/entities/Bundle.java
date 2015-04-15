@@ -11,7 +11,7 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 /**
- * The class Bundle represent bundle with ONLY ONE SINGLE BLOCK.  
+ * The class Bundle represents bundle with ONLY ONE SINGLE BLOCK.  
  *
  */
 public class Bundle {
