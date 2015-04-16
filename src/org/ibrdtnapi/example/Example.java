@@ -19,10 +19,10 @@ public class Example {
 
 	public static void main(String[] args) throws InterruptedException {
         BpAppPrinting bpApp = new BpAppPrinting("azee");
-        Bundle bundle = new Bundle("dtn://59/rcp", "That's my payload!  :D\n");
+        Bundle bundle = new Bundle("dtn://59/rcp", "That's my payload.\n");
         bpApp.send(bundle);
              
-        bundle = new Bundle("dtn://59/rcp", "That's my 2nd payload!  :D\n");
+        bundle = new Bundle("dtn://59/rcp", "That's my 2nd payload!--\n");
         bpApp.send(bundle);
 	}
 }
