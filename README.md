@@ -40,6 +40,8 @@ How does it work ?
 The two main classes are [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) and [BpApplication](src/org/ibrdtnapi/BpApplication.java). [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) is the class that manages the communication with the daemon through the two communicators (input and output). It notifies received bundles to the [BpApplication](src/org/ibrdtnapi/BpApplication.java) and sends bundles to the daemon on behalf of [BpApplication](src/org/ibrdtnapi/BpApplication.java). The [CommunicatorInput](src/org/ibrdtnapi/dispatcher/CommunicatorInput.java), among other classes, sets the state of the [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java). States are used so the [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) does not send a bundle while fetching a received one.
 [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) and [BpApplication](src/org/ibrdtnapi/BpApplication.java) communicate using observable [FifoBundleQueue](src/org/ibrdtnapi/entities/FifoBundleQueue.java), one for received bundles, the other one for the bundle to be sent.
 
+See the [architecture.svg](imgs/architecture.svg) to get a visual overview.
+
 License
 -------
 Apache License - Version 2.0, just like [IBR-DTN](http://trac.ibr.cs.tu-bs.de/project-cm-2012-ibrdtn/wiki/license).
