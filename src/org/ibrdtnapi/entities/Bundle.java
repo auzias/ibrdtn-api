@@ -26,7 +26,7 @@ public class Bundle {
 	private String custodian = null;
 	private int lifetime = 0;
 	private String encoded = null;
-	private String decoded = null;
+	private byte[] decoded = null;
 
 	public Bundle() {
 
@@ -39,7 +39,7 @@ public class Bundle {
 		this.destination = destination;
 	}
 
-	public Bundle(String destination, String payloadDecoded) {
+	public Bundle(String destination, byte[] payloadDecoded) {
 		this.destination = destination;
 		this.setDecoded(payloadDecoded);
 	}
@@ -123,7 +123,7 @@ public class Bundle {
 		if(this.encoded != null)
 			str.append("" + this.encoded);
 		if(this.decoded != null)
-			str.append("#" + this.decoded.trim() + "#");
+			str.append("#" + new String(this.decoded) + "#");
 
 		return str.toString();
 	}
@@ -139,19 +139,19 @@ public class Bundle {
 	public void setEncoded(String encoded) {
 		this.encoded  = new String(encoded);
 		try {
-			this.decoded = new String(new BASE64Decoder().decodeBuffer(this.encoded));
+			this.decoded = new BASE64Decoder().decodeBuffer(this.encoded);
 		} catch (IOException e) {
 			Bundle.log.warning("Could not base64::decode() the payload of the bundle:" + this + ". " + e.getMessage());
 		}
 	}
 
-	public void setDecoded(String decoded) {
-		this.decoded  = new String(decoded);
-		this.encoded = new String(new BASE64Encoder().encodeBuffer(this.decoded.getBytes())).trim();
+	public void setDecoded(byte[] decoded) {
+		this.decoded  = decoded;
+		this.encoded = new String(new BASE64Encoder().encodeBuffer(this.decoded)).trim();
 	}
 
 	public int getDataLength() {
-		return this.decoded.length();
+		return this.decoded.length;
 	}
 
 	public String getEncoded() {
