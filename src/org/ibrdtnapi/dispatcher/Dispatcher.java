@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Logger;
 
 import org.ibrdtnapi.Api;
@@ -40,6 +41,7 @@ import org.ibrdtnapi.entities.FifoBundleQueue;
 public class Dispatcher implements Observer {
 	private static final Logger log = Logger.getLogger(Dispatcher.class.getName());
 	private Dispatcher.State state = State.DISCONNECTED;
+	private ScheduledThreadPoolExecutor bundleFetcherExecutor = new ScheduledThreadPoolExecutor(Api.THREAD_POOL);
 	private FifoBundleQueue toFetchBundles = null;
 	private FifoBundleQueue receivedBundles = new FifoBundleQueue();
 	private FifoBundleQueue toSendBundles = null;
@@ -144,6 +146,10 @@ public class Dispatcher implements Observer {
 
 	public void setFetchingBundle(Bundle fetchingBundle) {
 		this.fetchingBundle = fetchingBundle;
+	}
+
+	public void addFetcher(Runnable task) {
+		this.bundleFetcherExecutor.execute(task);
 	}
 
 	public Dispatcher.State getState() {

@@ -134,7 +134,7 @@ public class CommunicatorInput implements Runnable {
 	private void notifyBundle(String str) {
 		Thread fetcherLauncher = new Thread(new FetcherLauncher(this.bundleNotified(str), this.toFetchBundles));
 		fetcherLauncher.setName("Fetcher launcher");
-		fetcherLauncher.start();
+		this.dispatcher.addFetcher(fetcherLauncher);
 	}
 
 	private Bundle bundleNotified(String str) {
