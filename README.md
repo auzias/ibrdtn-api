@@ -48,4 +48,5 @@ Apache License - Version 2.0, just like [IBR-DTN](http://trac.ibr.cs.tu-bs.de/pr
 
 To-do
 -----
- - Add executor (Thread poll) to [CommunicatorInput](src/org/ibrdtnapi/dispatcher/CommunicatorInput.java).
+ - [ ] Add executor (Thread poll) for outgoing bundles.
+ - [x] Add executor (Thread poll) for incomming bundles.
