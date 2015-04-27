@@ -21,8 +21,16 @@ public class Example {
         BpAppPrinting bpApp = new BpAppPrinting("azee");
         Bundle bundle = new Bundle("dtn://59/rcp", "That's my payload.\n".getBytes());
         bpApp.send(bundle);
-             
+        
         bundle = new Bundle("dtn://59/rcp", "That's my 2nd payload!--\n".getBytes());
         bpApp.send(bundle);
+
+        System.out.println("5 sec to go");
+        Thread.sleep(5000);
+        System.out.println("Killing the endpoint");
+        bpApp.stop();
+        System.out.println("Restart in 2 sec");
+        Thread.sleep(2000);
+        bpApp = new BpAppPrinting("azee");
 	}
 }

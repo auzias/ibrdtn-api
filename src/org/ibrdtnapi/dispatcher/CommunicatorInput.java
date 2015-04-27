@@ -85,9 +85,8 @@ public class CommunicatorInput implements Runnable {
 				}
 			}
 		} catch (IOException e) {
-			throw new ApiException("Could not read from the socket. " + e.getMessage());
+			CommunicatorInput.log.severe("CommunicatorInput Interrupted. " + e.getMessage());
 		}
-		CommunicatorInput.log.severe("Input from the daemon aborted!");
 	}
 
 	private void log(String str) {

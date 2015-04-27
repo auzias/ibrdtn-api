@@ -50,11 +50,13 @@ public class Dispatcher implements Observer {
 	private CommunicatorOutput communicatorOutput = null;
 	private Socket socket = null;
 	private Bundle fetchingBundle = null;
+	private String eid = "";
 
 	public Dispatcher(FifoBundleQueue toSendBundles, BpApplication application, String eid) {
 		this.toSendBundles = toSendBundles;
 		this.receivedBundles.addObserver(application);
-		this.connect(0, eid);
+		this.eid = eid;
+		this.connect(0, this.eid);
 	}
 
 	private void connect(int port, String eid) {
@@ -212,5 +214,14 @@ public class Dispatcher implements Observer {
 
 	public void addPendingBundle(Bundle bundle) {
 		this.pendingBundles.enqueue(bundle);
+	}
+
+	public void stop() {
+		if(this.socket != null)
+		try {
+			this.socket.close();
+		} catch (IOException e) {
+			Dispatcher.log.info("Socket of eid '" + this.eid + "' closed ");
+		}
 	}
 }

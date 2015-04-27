@@ -30,10 +30,11 @@ import org.ibrdtnapi.entities.FifoBundleQueue;
 public abstract class BpApplication implements Observer {
 	private FifoBundleQueue receivedBundles = null;
 	private FifoBundleQueue toSendBundles = new FifoBundleQueue();
+	private Dispatcher dispatcher = null;
 
 	public BpApplication(String eid) {
 		if(eid == null || eid.contains(" ")) throw new ApiException("The endpoint must be not null and not contain any space.");
-		Dispatcher dispatcher = new Dispatcher(toSendBundles, this, eid);
+		this.dispatcher = new Dispatcher(toSendBundles, this, eid);
 		this.toSendBundles.addObserver(dispatcher);
 		this.receivedBundles = dispatcher.getReceivedBundles();
 	}
@@ -48,5 +49,8 @@ public abstract class BpApplication implements Observer {
 			this.bundleReceived(((FifoBundleQueue)receivedBundles).dequeue());
 	}
 
+	public void stop() {
+		this.dispatcher.stop();
+	}
 	protected abstract void bundleReceived(Bundle b);
 }
