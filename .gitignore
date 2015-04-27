@@ -1,5 +1,7 @@
+.settings/
 .svn
 .classpath
 .project
 bin/
 *.log
+/target/
