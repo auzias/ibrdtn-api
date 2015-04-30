@@ -61,5 +61,18 @@ public abstract class BpApplication implements Observer {
 	public void stop() {
 		this.dispatcher.stop();
 	}
+
+	public String getEid() {
+		return this.dispatcher.getEid();
+	}
+
+	public String getNodeName() {
+		return this.dispatcher.getNodeName();
+	}
+
+	public String getURI() {
+		return this.dispatcher.getNodeName() + "/" + this.dispatcher.getEid();
+	}
+
 	protected abstract void bundleReceived(Bundle b);
 }

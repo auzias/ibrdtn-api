@@ -127,6 +127,8 @@ public class CommunicatorInput implements Runnable {
 			this.dispatcher.setState(State.BDL_REGISTERED);
 		} else if(str.startsWith("200 BUNDLE SENT")) {
 			this.dispatcher.setState(State.BDL_SENT);
+		} else if(str.startsWith("200 NODENAME")) {
+			this.dispatcher.setNodeName(str.split(" ")[2]);
 		}
 	}
 

@@ -51,6 +51,7 @@ public class Dispatcher implements Observer {
 	private Socket socket = null;
 	private Bundle fetchingBundle = null;
 	private String eid = "";
+	private String nodeName = null;
 
 	public Dispatcher(FifoBundleQueue toSendBundles, BpApplication application, String eid) {
 		this.toSendBundles = toSendBundles;
@@ -66,7 +67,7 @@ public class Dispatcher implements Observer {
 		} catch (Exception e) {
 			throw new ApiException("Cannot establish connection. Is IBR-DTN daemon running? Is it accessible on 127.0.0.1:" + port + "? " + e.getMessage());
 		}
-		
+
 		//Create CommunicatorInput and Output
 		try {
 			//Bind the input stream of the socket to a BufferReader.
@@ -96,6 +97,8 @@ public class Dispatcher implements Observer {
 		//Wait for confirmation
 		while(this.getState() != State.EXTENDED && this.getState() != State.ERROR);
 		if(this.getState() == State.ERROR) throw new ApiException("Could not initiate the extended protocol.");
+		this.communicatorOutput.query("nodename");
+		while(this.nodeName == null);
 		//If protocol extended is initiated we set an endpoint (if it's a singleton) xor add a registration (if it's not a singleton -and the EID is a group EID-)
 		if(this.getState() == State.EXTENDED) {
 			String query = (eid.contains(Api.NOT_SINGLETON) ? "registration add " : "set endpoint ") + eid + "\n";
@@ -223,5 +226,17 @@ public class Dispatcher implements Observer {
 		} catch (IOException e) {
 			Dispatcher.log.info("Socket of eid '" + this.eid + "' closed ");
 		}
+	}
+
+	public String getEid() {
+		return this.eid;
+	}
+
+	public void setNodeName(String name) {
+		this.nodeName = new String(name);
+	}
+
+	public String getNodeName() {
+		return this.nodeName;
 	}
 }
