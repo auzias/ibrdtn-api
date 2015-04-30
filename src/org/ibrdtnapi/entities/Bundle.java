@@ -20,7 +20,6 @@ public class Bundle {
 	private int sequenceNumber;
 	private String source = null;
 	private String destination = null;
-	private int length;
 	private int flags = 0;
 	private String reportto = null;
 	private String custodian = null;
@@ -100,10 +99,6 @@ public class Bundle {
 		this.source = source;
 	}
 
-	public void setLength(int length) {
-		this.length = length;
-	}
-
 	public String getSource() {
 		return source;
 	}
@@ -119,7 +114,7 @@ public class Bundle {
 		str.append(" -> " + ((this.destination == null) ? "destnt:none" : this.destination));
 		str.append(" @" + this.timestamp);
 		str.append(", data");
-		str.append("(" + this.length + "):");
+		str.append("(" + this.getLength() + "):");
 		if(this.encoded != null)
 			str.append("" + this.encoded);
 		if(this.decoded != null)
@@ -133,7 +128,7 @@ public class Bundle {
 	}
 
 	public int getLength() {
-		return this.length;
+		return this.decoded.length;
 	}
 
 	public void setEncoded(String encoded) {
@@ -156,5 +151,9 @@ public class Bundle {
 
 	public String getEncoded() {
 		return this.encoded;
+	}
+
+	public byte[] getDecoded() {
+		return this.decoded;
 	}
 }
