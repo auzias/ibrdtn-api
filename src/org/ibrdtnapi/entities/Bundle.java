@@ -114,7 +114,7 @@ public class Bundle {
 		str.append(" -> " + ((this.destination == null) ? "destnt:none" : this.destination));
 		str.append(" @" + this.timestamp);
 		str.append(", data");
-		str.append("(" + this.getLength() + "):");
+		str.append("(" + ((this.getLength() == 0) ? "X" : this.getLength()) + "):");
 		if(this.encoded != null)
 			str.append("" + this.encoded);
 		if(this.decoded != null)
@@ -128,7 +128,7 @@ public class Bundle {
 	}
 
 	public int getLength() {
-		return this.decoded.length;
+		return (this.decoded != null) ? this.decoded.length : 0;
 	}
 
 	public void setEncoded(String encoded) {
