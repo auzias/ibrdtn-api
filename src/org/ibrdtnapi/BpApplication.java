@@ -32,17 +32,26 @@ public abstract class BpApplication implements Observer {
 	private FifoBundleQueue toSendBundles = new FifoBundleQueue();
 	private Dispatcher dispatcher = null;
 
-	public BpApplication(String eid) {
+	public BpApplication() {
+		
+	}
+
+	public void setEid(String eid) {
 		if(eid == null || eid.contains(" ")) throw new ApiException("The endpoint must be not null and not contain any space.");
 		this.dispatcher = new Dispatcher(toSendBundles, this, eid);
 		this.toSendBundles.addObserver(dispatcher);
 		this.receivedBundles = dispatcher.getReceivedBundles();
 	}
 
+	public BpApplication(String eid) {
+		this.setEid(eid);
+	}
+
 	public boolean send(Bundle bundle) {
+		if(this.dispatcher == null) return false;
 		return this.toSendBundles.enqueue(bundle);
 	}
-	
+
 	@Override
 	public void update(Observable receivedBundles, Object o) {
 		if(this.receivedBundles == receivedBundles && !this.receivedBundles.isEmpty())
