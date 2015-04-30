@@ -64,8 +64,8 @@ public class Fetcher implements Runnable {
 					this.bundle.setCustodian(s.split(" ")[1]);
 				else if(s.startsWith("Lifetime:"))
 					this.bundle.setLifetime(Integer.parseInt(s.split(" ")[1]));
-				else if(s.startsWith("Length:"))
-					this.bundle.setLength(Integer.parseInt(s.split(" ")[1]));
+//				else if(s.startsWith("Length:"))
+//					this.bundle.setLength(Integer.parseInt(s.split(" ")[1]));
 			}
 			//Request to load the payload (base64 encoded)
 			this.communicatorOutput.query("payload 0 get 0 " + this.bundle.getLength());
