@@ -40,7 +40,7 @@ import org.ibrdtnapi.entities.FifoBundleQueue;
  */
 public class Dispatcher implements Observer {
 	private static final Logger log = Logger.getLogger(Dispatcher.class.getName());
-	private Dispatcher.State state = State.DISCONNECTED;
+	private volatile Dispatcher.State state = State.DISCONNECTED;
 	private ScheduledThreadPoolExecutor bundleFetcherExecutor = new ScheduledThreadPoolExecutor(Api.THREAD_POOL);
 	private FifoBundleQueue toFetchBundles = null;
 	private FifoBundleQueue receivedBundles = new FifoBundleQueue();
@@ -51,7 +51,7 @@ public class Dispatcher implements Observer {
 	private Socket socket = null;
 	private Bundle fetchingBundle = null;
 	private String eid = "";
-	private String nodeName = null;
+	private volatile String nodeName = null;
 
 	public Dispatcher(FifoBundleQueue toSendBundles, BpApplication application, String eid) {
 		this.toSendBundles = toSendBundles;
@@ -135,14 +135,15 @@ public class Dispatcher implements Observer {
 		while(this.getState() != State.IDLE);
 		//Fetch all bundle
 		do{
+			this.setState(State.FETCHING);
 			Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
 			threadFetcher.setName("Fetcher Thread");
 			threadFetcher.start();
 			while(this.getState() != State.BDL_READY && this.getState() != State.BDL_DELIVERED);
 			this.receivedBundles.enqueue(this.fetchingBundle);
 			while(this.getState() != State.BDL_DELIVERED);
-			this.setState(State.IDLE);
 		}while(!this.toFetchBundles.isEmpty());
+		this.setState(State.IDLE);
 	}
 
 	public FifoBundleQueue getReceivedBundles() {
@@ -220,13 +221,17 @@ public class Dispatcher implements Observer {
 	}
 
 	public void stop() {
+		//Wait for the endpoint to be idle
+		while(this.getState() != State.IDLE);
+
 		if(this.socket != null)
 		try {
 			this.socket.close();
-			this.setState(State.DISCONNECTED);
 		} catch (IOException e) {
 			Dispatcher.log.info("Socket of eid '" + this.eid + "' closed ");
 		}
+		this.nodeName = null;
+		this.setState(State.DISCONNECTED);
 	}
 
 	public String getEid() {
