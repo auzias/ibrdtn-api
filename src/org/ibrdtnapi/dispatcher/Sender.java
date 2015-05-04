@@ -38,6 +38,14 @@ public class Sender implements Runnable {
 			this.communicatorOutput.query("Source: api:me");
 			this.communicatorOutput.query("Destination: " + this.bundle.getDestination());
 			this.communicatorOutput.query("Processing flags: 144");//Why 144? Just the default, let's stick to it for now.
+			this.communicatorOutput.query("Timestamp: " + this.bundle.getTimestamp());
+			String reportto = (this.bundle.getReportto() != null) ? this.bundle.getReportto() : "dtn:none"; 
+			this.communicatorOutput.query("Reportto: " + reportto );
+			String custodian = (this.bundle.getCustodian() != null) ? this.bundle.getCustodian() : "dtn:none"; 
+			this.communicatorOutput.query("Custodian: " + custodian );
+			int lifetime = (this.bundle.getLifetime() != 0) ? this.bundle.getLifetime() : Api.DEFAULT_LIFETIME; 
+			this.communicatorOutput.query("Lifetime: " + lifetime);
+			this.communicatorOutput.query("Sequencenumber: " + this.bundle.getSequencenumber());
 			this.communicatorOutput.query("Blocks: 1");
 			this.communicatorOutput.query("");
 			this.communicatorOutput.query("Block: 1");
