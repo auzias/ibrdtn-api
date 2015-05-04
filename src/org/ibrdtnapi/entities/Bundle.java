@@ -20,7 +20,7 @@ public class Bundle {
 	private int sequenceNumber;
 	private String source = null;
 	private String destination = null;
-	private int flags = 0;
+	private byte flags = 0;
 	private String reportto = null;
 	private String custodian = null;
 	private int lifetime = 0;
@@ -69,7 +69,7 @@ public class Bundle {
 		return flags;
 	}
 
-	public void setFlags(int flags) {
+	public void setFlags(byte flags) {
 		this.flags = flags;
 	}
 
