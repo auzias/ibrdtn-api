@@ -7,6 +7,8 @@ package org.ibrdtnapi.entities;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.ibrdtnapi.Api;
+
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -67,10 +69,6 @@ public class Bundle {
 
 	public int getFlags() {
 		return flags;
-	}
-
-	public void setFlags(int flags) {
-		this.flags = flags;
 	}
 
 	public int getSequencenumber() {
@@ -173,5 +171,24 @@ public class Bundle {
 
 	public byte[] getDecoded() {
 		return this.decoded;
+	}
+
+	/**************************************************************************
+	**							FLAGS										 ** 
+	**************************************************************************/
+	public void setFlags(int flags) {
+		this.flags = flags;
+	}
+
+	public void setSingleFlag(int flag) {
+		this.flags += flag;
+	}
+
+	public void clearSingleFlag(int flag) {
+		this.flags -= flag;
+	}
+
+	public boolean isSingleFlag(int flag) {
+		return ((this.flags & flag) == flag);
 	}
 }
