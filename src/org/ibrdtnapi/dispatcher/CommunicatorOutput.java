@@ -46,7 +46,7 @@ public class CommunicatorOutput {
 		try {
 			synchronized(Api.lockFile) {
 				Api.logFile = new FileWriter(Api.LOG_FILE_PATH, Api.APPEND);
-				Api.logFile.append(">> " + str + "\n");
+				Api.logFile.append(str + "\n");
 				Api.logFile.flush();
 				Api.logFile.close();
 			}
