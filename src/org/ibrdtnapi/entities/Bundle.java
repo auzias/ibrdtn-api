@@ -42,7 +42,25 @@ public class Bundle {
 		this.destination = destination;
 		this.setDecoded(payloadDecoded);
 	}
-	
+
+	//Deep copy constructor:
+	public Bundle(Bundle bundle) {
+		this.timestamp = bundle.timestamp;
+		this.sequenceNumber = bundle.sequenceNumber;
+		if(bundle.source != null)
+			this.source = new String(bundle.source);
+		if(bundle.destination != null)
+			this.destination = new String(bundle.destination);
+		this.flags = bundle.flags;
+		if(bundle.reportto != null)
+			this.reportto = new String(bundle.reportto);
+		if(bundle.custodian != null)
+			this.custodian = new String(bundle.custodian);
+		this.lifetime = bundle.lifetime;
+		if(bundle.encoded != null) //It could be shorter to copy the value instead of base64-calculating it again
+			this.setEncoded(new String(bundle.encoded));
+	}
+
 	public long getTimestamp() {
 		return timestamp;
 	}

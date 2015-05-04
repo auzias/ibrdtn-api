@@ -48,8 +48,10 @@ public abstract class BpApplication implements Observer {
 	}
 
 	public boolean send(Bundle bundle) {
-		if(this.dispatcher == null) return false;
-		return this.toSendBundles.enqueue(bundle);
+		if(this.dispatcher == null || bundle == null) return false;
+		//else the bundle is copied and added to the queue.
+		Bundle bdl = new Bundle(bundle);
+		return this.toSendBundles.enqueue(bdl);
 	}
 
 	@Override
