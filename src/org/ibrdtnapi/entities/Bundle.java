@@ -69,10 +69,6 @@ public class Bundle {
 		return flags;
 	}
 
-	public void setFlags(int flags) {
-		this.flags = flags;
-	}
-
 	public int getSequencenumber() {
 		return this.sequenceNumber;
 	}
