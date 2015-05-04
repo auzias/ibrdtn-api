@@ -223,6 +223,7 @@ public class Dispatcher implements Observer {
 		if(this.socket != null)
 		try {
 			this.socket.close();
+			this.setState(State.DISCONNECTED);
 		} catch (IOException e) {
 			Dispatcher.log.info("Socket of eid '" + this.eid + "' closed ");
 		}

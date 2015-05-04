@@ -61,6 +61,7 @@ public abstract class BpApplication implements Observer {
 	}
 
 	public void stop() {
+		while(this.dispatcher.getState() != Dispatcher.State.IDLE);
 		this.dispatcher.stop();
 	}
 
