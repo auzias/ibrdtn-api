@@ -49,7 +49,7 @@ public class Fetcher implements Runnable {
 			String[] meta = buffer.split("\n");
 			for(String s : meta) {
 				if(s.startsWith("Processing flags:"))
-					this.bundle.setFlags((byte)Integer.parseInt(s.split(" ")[2]));
+					this.bundle.setFlags(Integer.parseInt(s.split(" ")[2]));
 				else if(s.startsWith("Timestamp:"))
 					this.bundle.setTimestamp(Long.parseLong(s.split(" ")[1]));
 				else if(s.startsWith("Sequencenumber:"))
