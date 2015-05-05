@@ -1,3 +1,7 @@
+![IRISA](https://www.irisa.fr/sites/all/themes/irisa_theme/logo.png)
+![UBS](http://www.univ-ubs.fr/images/logoUBS120x110px.jpg)
+[CASA research team](http://www-casa.irisa.fr/)
+
 IBR-DTN Java API
 ================
 
