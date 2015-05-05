@@ -2,6 +2,8 @@
 ![UBS](http://www.univ-ubs.fr/images/logoUBS120x110px.jpg)
 [CASA research team](http://www-casa.irisa.fr/)
 
+API being programmed during my Ph.D. within the [CASA research team](http://www-casa.irisa.fr/) at the [UBS](http://www.univ-ubs.fr/) with the laboratory [IRISA](https://www.irisa.fr/).
+
 IBR-DTN Java API
 ================
 
@@ -45,10 +47,6 @@ The two main classes are [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.ja
 [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) and [BpApplication](src/org/ibrdtnapi/BpApplication.java) communicate using observable [FifoBundleQueue](src/org/ibrdtnapi/entities/FifoBundleQueue.java), one for received bundles, the other one for the bundle to be sent.
 
 See the [architecture.svg](imgs/architecture.svg) to get a visual overview.
-
-License
--------
-Apache License - Version 2.0, just like [IBR-DTN](http://trac.ibr.cs.tu-bs.de/project-cm-2012-ibrdtn/wiki/license).
 
 To-do
 -----
