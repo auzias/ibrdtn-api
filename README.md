@@ -13,31 +13,34 @@ This project aims to offer a simplified and easy-to-use java API for the [IBR-DT
 
 How to use it?
 --------------
-The first thing you have to do is extend the abstract class [BpApplication](src/org/ibrdtnapi/BpApplication.java) in order to override the `bundleReceived(Bundle b)` method to process, as need be, the received bundles:
+The first thing you have to do is to create your own handler implementing the interface [BundleHandler](src/org/ibrdtnapi/BundleHandler.java) in order to override the `onReceive(Bundle bundle)` method to process, as need be, the received bundles:
 ```java
-public class MyBpApp extends BpApplication {
-
-public BpAppPrinting(String eid) {
-                super(eid);
-        }
-
-        @Override
-        protected void bundleReceived(Bundle b) {
-                System.out.println("Received bundle:" + b.toString());
-        }
+public class PrintingHandler implements BundleHandler {
+	@Override
+	public void onReceive(Bundle bundle) {
+		System.out.println("Received bundle:" + bundle.toString());
+	}
 }
 ```
-You can then create your `MyBpApp` instance by setting the EID in the constructor. [IBR-DTN](http://trac.ibr.cs.tu-bs.de/project-cm-2012-ibrdtn/) supports both group and singleton EID. If your local node name is *dtn://localname* and you want to receive bundles sent to the URI *dtn://localname/MyEID* then call the constructor with the path-part of the URI, this way: `MyBpApp application = new MyBpApp(MyEID);`. However, if you want to receive bundles sent to the URI *dtn://global/advertise* call the constructor with the full URI. If the `eid` contains "://" it is assumed that the application is **not** a singleton.
+You can then create your `MyBpApplication` instance and set the EID. [IBR-DTN](http://trac.ibr.cs.tu-bs.de/project-cm-2012-ibrdtn/) supports both group and singleton EID. If your local node name is *dtn://localname* and you want to receive bundles sent to the URI *dtn://localname/MyApp* then set the eid with the **path-part** of the URI, this way: `bpApp.setEid("MyApp");`. However, if you want to receive bundles sent to the URI *dtn://global/all* set the EID with the **full** URI, not the path-part only. If the `eid` contains "://" it is assumed that the application is **not** a singleton.
 
 To send a bundle, just call the method `send(Bundle bundle)` of [BpApplication](src/org/ibrdtnapi/BpApplication.java).
 
 Here is a full example:
 ```java
-        public static void main(String[] args) throws InterruptedException {
-          //My local node name is "dtn://zulu"
-          BpAppPrinting bpApp = new BpAppPrinting("log");//Bundles sent to "dtn://zulu/log" will be received
-          Bundle bundle = new Bundle("dtn://panthers/X", "Payload\n".getBytes());
-          bpApp.send(bundle);//This will send the bundle from dtn://zulu/log to dtn://panthers/X, with the payload "Payload\n".
+    public static void main(String[] args) throws InterruptedException {
+        //My local node name is "dtn://actuator"
+        String eid = "app";
+        BpApplication bpApp = new BpApplication();
+        //You can also call the constructor as follow: new BpApplication(eid);
+        //and get rid of the next line  
+        bpApp.setEid(eid); //Bundle sent to "dtn://actuator/app" will be received..
+        //Set your Handler
+        bpApp.setHandler(new PrintingHandler());//.. and processed by this handler.
+
+        Bundle bundle = new Bundle("dtn://logger/X", "Payload\n".getBytes());
+        //This will send the bundle from dtn://actuator/app to dtn://logger/X, with the payload "Payload\n".
+        bpApp.send(bundle);
         }
 ```
 

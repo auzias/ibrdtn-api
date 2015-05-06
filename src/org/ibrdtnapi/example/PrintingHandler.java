@@ -22,5 +22,4 @@ public class PrintingHandler implements BundleHandler {
 	public void onReceive(Bundle bundle) {
 		System.out.println("Received bundle:" + bundle.toString());
 	}
-
 }
