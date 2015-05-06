@@ -18,10 +18,15 @@ import org.ibrdtnapi.entities.Bundle;
 public class Example {
 
 	public static void main(String[] args) throws InterruptedException {
-        BpAppPrinting bpApp = new BpAppPrinting("azee");
+		String eid = "app";
+        BpApplication bpApp = new BpApplication(eid);
+        bpApp.setHandler(new PrintingHandler());
+        
+        System.out.println(bpApp.getURI());
+        
         Bundle bundle = new Bundle("dtn://59/rcp", "That's my payload.\n".getBytes());
         bpApp.send(bundle);
-        
+/*
         bundle = new Bundle("dtn://59/rcp", "That's my 2nd payload!--\n".getBytes());
         bpApp.send(bundle);
 
@@ -31,6 +36,7 @@ public class Example {
         bpApp.stop();
         System.out.println("Restart in 2 sec");
         Thread.sleep(2000);
-        bpApp = new BpAppPrinting("azee");
+        bpApp = new BpApplication(eid);
+*/
 	}
 }

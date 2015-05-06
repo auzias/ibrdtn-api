@@ -5,25 +5,22 @@
 package org.ibrdtnapi.example;
 
 import org.ibrdtnapi.BpApplication;
+import org.ibrdtnapi.BundleHandler;
 import org.ibrdtnapi.entities.Bundle;
 
 /**
  *
- * An example of MyOwnApp extending {@link BpApplication}
+ * An example of MyOwnApp implementing {@link BundleHandler}
  * to override the method called once a bundle is received.
  * 
  * Process it as you need.
  *
  */
-public class BpAppPrinting extends BpApplication {
-
-	public BpAppPrinting(String eid) {
-		super(eid);
-	}
+public class PrintingHandler implements BundleHandler {
 
 	@Override
-	protected void bundleReceived(Bundle b) {
-		System.out.println("Received bundle:" + b.toString());
+	public void onReceive(Bundle bundle) {
+		System.out.println("Received bundle:" + bundle.toString());
 	}
 
 }

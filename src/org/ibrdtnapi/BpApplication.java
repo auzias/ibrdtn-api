@@ -27,10 +27,11 @@ import org.ibrdtnapi.entities.FifoBundleQueue;
  * where MyApp is a class extending BpApplication.
  *
  */
-public abstract class BpApplication implements Observer {
+public class BpApplication implements Observer {
 	private FifoBundleQueue receivedBundles = null;
 	private FifoBundleQueue toSendBundles = new FifoBundleQueue();
 	private Dispatcher dispatcher = null;
+	private BundleHandler handler = null;
 
 	public BpApplication() {
 		
@@ -41,6 +42,10 @@ public abstract class BpApplication implements Observer {
 		this.dispatcher = new Dispatcher(toSendBundles, this, eid);
 		this.toSendBundles.addObserver(dispatcher);
 		this.receivedBundles = dispatcher.getReceivedBundles();
+	}
+
+	public void setHandler(BundleHandler handler) {
+		this.handler = handler;
 	}
 
 	public BpApplication(String eid) {
@@ -77,5 +82,7 @@ public abstract class BpApplication implements Observer {
 		return this.dispatcher.getNodeName() + "/" + this.dispatcher.getEid();
 	}
 
-	protected abstract void bundleReceived(Bundle b);
+	public void bundleReceived(Bundle b) {
+		this.handler.onReceive(b);
+	}
 }
