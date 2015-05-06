@@ -4,6 +4,7 @@
  */
 package org.ibrdtnapi;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -32,6 +33,7 @@ public class BpApplication implements Observer {
 	private FifoBundleQueue toSendBundles = new FifoBundleQueue();
 	private Dispatcher dispatcher = null;
 	private BundleHandler handler = null;
+	private ArrayList<Bundle> pendingBundle = new ArrayList<Bundle>();
 
 	public BpApplication() {
 		
@@ -46,6 +48,8 @@ public class BpApplication implements Observer {
 
 	public void setHandler(BundleHandler handler) {
 		this.handler = handler;
+		for (Bundle bundle : pendingBundle)
+			handler.onReceive(bundle);
 	}
 
 	public BpApplication(String eid) {
@@ -83,6 +87,9 @@ public class BpApplication implements Observer {
 	}
 
 	public void bundleReceived(Bundle b) {
-		this.handler.onReceive(b);
+		if(this.handler != null)
+			this.handler.onReceive(b);
+		else
+			this.pendingBundle.add(b);
 	}
 }
