@@ -50,5 +50,6 @@ See the [architecture.svg](imgs/architecture.svg) to get a visual overview.
 
 To-do
 -----
- - [ ] Add executor (Thread poll) for outgoing bundles.
- - [x] Add executor (Thread poll) for incomming bundles.
+ - [x] Add executor (Thread poll) for outgoing bundles. *Actually having a Threads for each bundles is useless ..*
+ - [x] Add executor (Thread poll) for incomming bundles. * .. as the work has to be done sequentially. The `ScheduledThreadPoolExecutor` works with only one thread.*
+ - [ ] Remove the `ScheduledThreadPoolExecutor` and create a `worker` instead.
