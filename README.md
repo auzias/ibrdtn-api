@@ -55,5 +55,6 @@ To-do
 -----
  - [x] Add executor (Thread poll) for outgoing bundles. *Actually having a Threads for each bundles is useless ..*
  - [x] Add executor (Thread poll) for incomming bundles. * .. as the work has to be done sequentially. The `ScheduledThreadPoolExecutor` works with only one thread.*
- - [ ] Remove the `ScheduledThreadPoolExecutor` and create a `worker` instead.
+ - [x] Set, clear and test single flags of bundle.
+ - [x] Remove the `ScheduledThreadPoolExecutor` and create a `Executors.newSingleThreadExecutor` instead.
  - [ ] :bug: Solve the bug when an application is stopped, and started back.
