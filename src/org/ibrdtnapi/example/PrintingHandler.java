@@ -4,7 +4,6 @@
  */
 package org.ibrdtnapi.example;
 
-import org.ibrdtnapi.BpApplication;
 import org.ibrdtnapi.BundleHandler;
 import org.ibrdtnapi.entities.Bundle;
 
