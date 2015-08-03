@@ -55,7 +55,7 @@ Performance
 -----------
 Tests performed on a localhost with a i5-3570 CPU @ 3.40GHz, running Debian 3.2.68-1+deb7u2, IBR-DTN daemon 0.12.1 (build 7c220eb) and Java 1.7 (OpenJDK Runtime Environment (IcedTea 2.5.5) (7u79-2.5.5-1~deb7u1)).
 ### Reception
-With the code of 2562d61bb35ae34c9f2d0cf1444ef93f69be1f20, 2000 bundles were sent before the  [app](src/org/ibrdtnapi/BpApplication.java) registered itself. The [BundleHandler](src/org/ibrdtnapi/BundleHandler.java) code didn't process bundles but just counted them and checked if 2000 were received to finally print `System.currentTimeMillis()` once the last was received.
+With the code of [2562d61](https://github.com/auzias/ibrdtn-api/commit/2562d61bb35ae34c9f2d0cf1444ef93f69be1f20), 2000 bundles were sent before the  [app](src/org/ibrdtnapi/BpApplication.java) registered itself. The [BundleHandler](src/org/ibrdtnapi/BundleHandler.java) code didn't process bundles but just counted them and checked if 2000 were received to finally print `System.currentTimeMillis()` once the last was received.
 The average time of reception for the 2000 is 5030 ms (about  2.5 ms/each).
 Note that this measurement include the delay of registration.
 ### Registration
