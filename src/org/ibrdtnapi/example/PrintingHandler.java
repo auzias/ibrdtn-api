@@ -23,8 +23,6 @@ public class PrintingHandler implements BundleHandler {
 	@Override
 	public void onReceive(Bundle bundle) {
 		this.receivedBundle++;
-		//System.out.println("Received bundle (" + this.receivedBundle + "):" + bundle.toString());
-		if(this.receivedBundle == 2000)
-			System.out.println(System.currentTimeMillis());
+		System.out.println("Received bundle (" + this.receivedBundle + "):" + bundle.toString());
 	}
 }
