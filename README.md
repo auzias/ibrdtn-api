@@ -68,6 +68,6 @@ To-do
  - [x] Set, clear and test single flags of bundle.
  - [x] Remove the `ScheduledThreadPoolExecutor` and create a `Executors.newSingleThreadExecutor` instead.
  - [ ] :bug: Solve the bug when an application is stopped, and started back.
-  - [ ] Test reception performance.
-  - [ ] Test registration performance.
+  - [x] Test reception performance.
+  - [x] Test registration performance.
   - [ ] Test emission performance.
