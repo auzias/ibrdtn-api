@@ -4,6 +4,8 @@
  */
 package org.ibrdtnapi.example;
 
+import java.util.Date;
+
 import org.ibrdtnapi.BundleHandler;
 import org.ibrdtnapi.entities.Bundle;
 
@@ -16,9 +18,13 @@ import org.ibrdtnapi.entities.Bundle;
  *
  */
 public class PrintingHandler implements BundleHandler {
+	private int receivedBundle = 0;
 
 	@Override
 	public void onReceive(Bundle bundle) {
-		System.out.println("Received bundle:" + bundle.toString());
+		this.receivedBundle++;
+		//System.out.println("Received bundle (" + this.receivedBundle + "):" + bundle.toString());
+		if(this.receivedBundle == 2000)
+			System.out.println(System.currentTimeMillis());
 	}
 }

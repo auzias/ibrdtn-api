@@ -4,6 +4,8 @@
  */
 package org.ibrdtnapi.example;
 
+import java.util.Date;
+
 import org.ibrdtnapi.BpApplication;
 import org.ibrdtnapi.entities.Bundle;
 
@@ -19,13 +21,14 @@ public class Example {
 
 	public static void main(String[] args) throws InterruptedException {
 		String eid = "app";
+		System.out.println(System.currentTimeMillis());
         BpApplication bpApp = new BpApplication(eid);
         bpApp.setHandler(new PrintingHandler());
         
         System.out.println(bpApp.getURI());
         
-        Bundle bundle = new Bundle("dtn://59/rcp", "That's my payload.\n".getBytes());
-        bpApp.send(bundle);
+//        Bundle bundle = new Bundle("dtn://59/rcp", "That's my payload.\n".getBytes());
+//        bpApp.send(bundle);
 /*
         bundle = new Bundle("dtn://59/rcp", "That's my 2nd payload!--\n".getBytes());
         bpApp.send(bundle);
