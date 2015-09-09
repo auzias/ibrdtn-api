@@ -12,7 +12,6 @@ public class Api {
 	public static FileWriter logFile = null;
 	public static Object lockFile = new Object();
 	public static Object lockFetcher = new Object();
-	public static Object lockSender = new Object();
 	
 	//Flags:
 	public static final int FRAGMENT = (1 << 0x00);
