@@ -64,6 +64,9 @@ The average delay for an [app](src/org/ibrdtnapi/BpApplication.java) to create t
 This code was first a POC of an easy-to-use IBR-DTN Java interface. The code has been made in a **quick-and-dirty** way. This include many lines with `while(this.dispatcher.getState() != State.SOME_STATE);`. These active wait are CPU eater, even though two `while();` _at most_ can run at the same time.
 A *quick-and-dirty* (again, but well... A PhD Thesis is already consuming, isn't it?) solution would be to add a `Thread.Sleep(5);`. This would (partially) solve the CPU usage.
 A *clean* solution to handle this would be to develop a state automate by using a couple of CallbackHandler.
+Here is the output of `time` to receive 200 bundle using the `dtnrecv` command-line tool, and the Java interface:
+dtnrecv --count 200 --name test  0.02s user 0.01s system 44% cpu 0.054 total
+java -jar ibr-dtn_java-api.jar  1.11s user 0.20s system 140% cpu 0.934 total
 
 
 To-do
@@ -72,7 +75,8 @@ To-do
  - [x] Add executor (Thread poll) for incomming bundles. * .. as the work has to be done sequentially. The `ScheduledThreadPoolExecutor` works with only one thread.*
  - [x] Set, clear and test single flags of bundle.
  - [x] Remove the `ScheduledThreadPoolExecutor` and create a `Executors.newSingleThreadExecutor` instead.
+ - [x] Test reception performance.
+ - [x] Test registration performance.
+ - [x] Test emission performance.
  - [ ] :bug: Solve the bug when an application is stopped, and started back.
-  - [x] Test reception performance.
-  - [x] Test registration performance.
-  - [ ] Test emission performance.
+ - [ ] CPU usage friendly.
