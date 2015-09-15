@@ -24,7 +24,7 @@ public class Example {
 		System.out.println(System.currentTimeMillis());
         BpApplication bpApp = new BpApplication(eid);
         bpApp.setHandler(new PrintingHandler());
-        
+
         int numberOfBundlesToSend = 2000;
         String destination = "dtn://59/rcp";
         System.out.println("Hi! I'm " + bpApp.getURI() + " and I will send " + numberOfBundlesToSend + " bundles to " + destination);
