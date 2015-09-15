@@ -22,7 +22,17 @@ public class PrintingHandler implements BundleHandler {
 
 	@Override
 	public void onReceive(Bundle bundle) {
-		this.receivedBundle++;
-		System.out.println("Received bundle (" + this.receivedBundle + "):" + bundle.toString().replaceAll("\\n", " "));
+//		System.out.println("Received bundle (" + this.receivedBundle + "):" + bundle.toString().replaceAll("\\n", " "));
+
+		if(incr() == 10000) {
+			System.out.println("end:" + System.currentTimeMillis());
+			System.exit(0);
+		}
+
+	}
+
+	private synchronized int incr() {
+		System.out.println(this.receivedBundle++);
+		return this.receivedBundle;
 	}
 }

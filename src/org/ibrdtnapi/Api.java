@@ -32,4 +32,15 @@ public class Api {
 	public static final int REQUEST_REPORT_OF_BUNDLE_FORWARDING = (1 << 0x10);
 	public static final int REQUEST_REPORT_OF_BUNDLE_DELIVERY = (1 << 0x11);
 	public static final int REQUEST_REPORT_OF_BUNDLE_DELETION = (1 << 0x12);
+	
+	public static void sleepWait() {
+
+ 		try {
+			//Thread.sleep(1);
+			Thread.sleep(0, 1);
+		} catch (InterruptedException e) {
+			// We waited a bit less than 5 ms.
+		}
+
+	}
 }

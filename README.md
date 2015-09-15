@@ -63,11 +63,19 @@ The average delay for an [app](src/org/ibrdtnapi/BpApplication.java) to create t
 ### CPU usage
 This code was first a POC of an easy-to-use IBR-DTN Java interface. The code has been made in a **quick-and-dirty** way. This include many lines with `while(this.dispatcher.getState() != State.SOME_STATE);`. These active wait are CPU eater, even though two `while();` _at most_ can run at the same time.
 A *quick-and-dirty* (again, but well... A PhD Thesis is already consuming, isn't it?) solution would be to add a `Thread.Sleep(5);`. This would (partially) solve the CPU usage.
-A *clean* solution to handle this would be to develop a state automate by using a couple of CallbackHandler.
+A *clean* solution to handle this would be to develop a state automate by using Java Future.
 Here is the output of `time` to receive 200 bundle using the `dtnrecv` command-line tool, and the Java interface:
-dtnrecv --count 200 --name test  0.02s user 0.01s system 44% cpu 0.054 total
+````bash
+dtnrecv --count 200 --name test 0.02s user 0.01s system 44%  cpu 0.054 total
+#With the CPU hungry version:
 java -jar ibr-dtn_java-api.jar  1.11s user 0.20s system 140% cpu 0.934 total
-
+#With the *quick-and-dirty* solution (and a 1 ns sleep):
+java -jar t-while_wait-1ns.jar  0.89s user 0.18s system 62% cpu 1.728 total
+#With 10k bundle to receive:
+time dtnrecv --count 10000 --name test             0.59s user 0.15s system 24% cpu 3.097 total
+time java -jar 10000-exit_test-while_wait-1ns.jar  9.08s user 6.66s system 23% cpu 1:07.43 total
+````
+Using the Java interface is far slower, but the CPU usage is far more friendly than before. Again, this is *not* the best solution!
 
 To-do
 -----

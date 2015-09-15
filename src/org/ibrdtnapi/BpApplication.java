@@ -70,7 +70,7 @@ public class BpApplication implements Observer {
 	}
 
 	public void stop() {
-		while(this.dispatcher.getState() != Dispatcher.State.IDLE);
+		while(this.dispatcher.getState() != Dispatcher.State.IDLE) { Api.sleepWait(); };
 		this.dispatcher.stop();
 	}
 

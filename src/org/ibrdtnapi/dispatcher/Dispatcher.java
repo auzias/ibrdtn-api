@@ -93,10 +93,10 @@ public class Dispatcher implements Observer {
 	}
 
 	private void initEndpoint(String eid) {
-		while(this.getState() != State.CONNECTED);
+		while(this.getState() != State.CONNECTED) { Api.sleepWait(); };
 		this.communicatorOutput.query("protocol extended");
 		//Wait for confirmation
-		while(this.getState() != State.EXTENDED && this.getState() != State.ERROR);
+		while(this.getState() != State.EXTENDED && this.getState() != State.ERROR) { Api.sleepWait(); };
 		if(this.getState() == State.ERROR) throw new ApiException("Could not initiate the extended protocol.");
 		this.communicatorOutput.query("nodename");
 		while(this.nodeName == null);
@@ -105,7 +105,7 @@ public class Dispatcher implements Observer {
 			String query = (eid.contains(Api.NOT_SINGLETON) ? "registration add " : "set endpoint ") + eid + "\n";
 			this.communicatorOutput.query(query);
 		}
-		while(this.getState() != State.IDLE);
+		while(this.getState() != State.IDLE) { Api.sleepWait(); };
 	}
 
 	@Override
@@ -121,28 +121,28 @@ public class Dispatcher implements Observer {
 
 	private synchronized void send(Bundle bundle) {
 		//Wait to be ready to send next bundle
-		while(this.getState() != State.IDLE);
+		while(this.getState() != State.IDLE) { Api.sleepWait(); };
 		do{
 			Thread threadSender = new Thread(new Sender(this, this.communicatorOutput, bundle));
 			threadSender.setName("Sender Thread");
 			threadSender.start();
-			while(this.getState() != State.BDL_SENT);
+			while(this.getState() != State.BDL_SENT) { Api.sleepWait(); };
 		}while(!this.toSendBundles.isEmpty());
 		this.setState(State.IDLE);
 	}
 
 	private synchronized void fetch(Bundle bundle) {
 		//Wait to be ready to fetch next bundle
-		while(this.getState() != State.IDLE);
+		while(this.getState() != State.IDLE) { Api.sleepWait(); };
 		//Fetch all bundle
 		do{
 			this.setState(State.FETCHING);
 			Thread threadFetcher = new Thread(new Fetcher(this, this.communicatorOutput, this.communicatorInput, bundle));
 			threadFetcher.setName("Fetcher Thread");
 			threadFetcher.start();
-			while(this.getState() != State.BDL_READY && this.getState() != State.BDL_DELIVERED);
+			while(this.getState() != State.BDL_READY && this.getState() != State.BDL_DELIVERED) { Api.sleepWait(); };
 			this.receivedBundles.enqueue(this.fetchingBundle);
-			while(this.getState() != State.BDL_DELIVERED);
+			while(this.getState() != State.BDL_DELIVERED) { Api.sleepWait(); };
 		}while(!this.toFetchBundles.isEmpty());
 		this.setState(State.IDLE);
 	}
@@ -223,7 +223,7 @@ public class Dispatcher implements Observer {
 
 	public void stop() {
 		//Wait for the endpoint to be idle
-		while(this.getState() != State.IDLE);
+		while(this.getState() != State.IDLE) { Api.sleepWait(); };
 
 		if(this.socket != null)
 		try {

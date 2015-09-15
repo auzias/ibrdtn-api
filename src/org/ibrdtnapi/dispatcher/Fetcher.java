@@ -40,10 +40,10 @@ public class Fetcher implements Runnable {
 			Fetcher.log.fine("Fetching started with:" + this.bundle);
 			//Request to load the bundle into the register:
 			this.communicatorOutput.query("bundle load " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());
-			while(this.dispatcher.getState() != State.BDL_LOADED);
+			while(this.dispatcher.getState() != State.BDL_LOADED) { Api.sleepWait(); };
 			//Request to load the meta-data
 			this.communicatorOutput.query("bundle info");
-			while(this.dispatcher.getState() != State.INFO_BUFFERED);
+			while(this.dispatcher.getState() != State.INFO_BUFFERED) { Api.sleepWait(); };
 			//Parse the meta-data
 			String buffer = this.communicatorInput.getBuffer();
 			String[] meta = buffer.split("\n");
@@ -69,7 +69,7 @@ public class Fetcher implements Runnable {
 			}
 			//Request to load the payload (base64 encoded)
 			this.communicatorOutput.query("payload 0 get 0 " + this.bundle.getLength());
-			while(this.dispatcher.getState() != State.PLD_BUFFERED);
+			while(this.dispatcher.getState() != State.PLD_BUFFERED) { Api.sleepWait(); };
 			//Set the encoded payload to the bundle
 			buffer = this.communicatorInput.getBuffer();
 			String[] payloadBuffer = buffer.split("\n");

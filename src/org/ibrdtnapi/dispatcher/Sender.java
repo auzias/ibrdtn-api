@@ -31,7 +31,7 @@ public class Sender implements Runnable {
 		Sender.log.fine("Sending started with:" + this.bundle);
 		//Request the daemon to receive a bundle:
 		this.communicatorOutput.query("bundle put plain");
-		while(this.dispatcher.getState() != State.PUTTING);
+		while(this.dispatcher.getState() != State.PUTTING) { Api.sleepWait(); };
 		this.communicatorOutput.query("Source: api:me");
 		this.communicatorOutput.query("Destination: " + this.bundle.getDestination());
 		this.communicatorOutput.query("Processing flags: 144");//Why 144? Just the default, let's stick to it for now.
@@ -52,9 +52,9 @@ public class Sender implements Runnable {
 		this.communicatorOutput.query(this.bundle.getEncoded());
 		this.communicatorOutput.query("");
 		this.communicatorOutput.query("");
-		while(this.dispatcher.getState() != State.BDL_REGISTERED);
+		while(this.dispatcher.getState() != State.BDL_REGISTERED) { Api.sleepWait(); };
 		this.communicatorOutput.query("bundle send");
-		while(this.dispatcher.getState() != State.BDL_SENT);
+		while(this.dispatcher.getState() != State.BDL_SENT) { Api.sleepWait(); };
 		
 		Sender.log.fine("Sending finished with:" + this.bundle);
 	}
