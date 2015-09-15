@@ -4,10 +4,7 @@
  */
 package org.ibrdtnapi.example;
 
-import java.util.Date;
-
 import org.ibrdtnapi.BpApplication;
-import org.ibrdtnapi.entities.Bundle;
 
 /**
  * 
