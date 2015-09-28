@@ -28,8 +28,9 @@ public class Sender implements Runnable {
 
 	@Override
 	public void run() {
+		final int FirstBlock = 0;
 		Sender.log.fine("Sending started with:" + this.bundle);
-		//Request the daemon to receive a bundle:
+		//Request the daemon to send a bundle:
 		this.communicatorOutput.query("bundle put plain");
 		while(this.dispatcher.getState() != State.PUTTING) { Api.sleepWait(); };
 		this.communicatorOutput.query("Source: api:me");
@@ -43,19 +44,39 @@ public class Sender implements Runnable {
 		int lifetime = (this.bundle.getLifetime() != 0) ? this.bundle.getLifetime() : Api.DEFAULT_LIFETIME; 
 		this.communicatorOutput.query("Lifetime: " + lifetime);
 		this.communicatorOutput.query("Sequencenumber: " + this.bundle.getSequencenumber());
-		this.communicatorOutput.query("Blocks: 1");
+		// If you set the number of blocks you want to send, the daemon will wait for all blocks to be appended.
+		// This API _put_ a bundle with a single block, *then* adds blocks to it.
+		this.communicatorOutput.query("Blocks: 1");// + this.bundle.getNumberOfBlocks());
 		this.communicatorOutput.query("");
 		this.communicatorOutput.query("Block: 1");
 		this.communicatorOutput.query("Flags: LAST_BLOCK");
-		this.communicatorOutput.query("Length: " + this.bundle.getDataLength());
+		this.communicatorOutput.query("Length: " + this.bundle.getLength(FirstBlock));
 		this.communicatorOutput.query("");
-		this.communicatorOutput.query(this.bundle.getEncoded());
+		this.communicatorOutput.query(this.bundle.getEncoded(FirstBlock));
+		this.communicatorOutput.query("");
+		this.communicatorOutput.query("");
 		this.communicatorOutput.query("");
 		this.communicatorOutput.query("");
 		while(this.dispatcher.getState() != State.BDL_REGISTERED) { Api.sleepWait(); };
+
+		//Add other payload blocks (if any):
+		if(this.bundle.getNumberOfBlocks() > 1) {
+			for(int i = 1; i < this.bundle.getNumberOfBlocks(); i++) {
+				this.communicatorOutput.query("bundle block add 0");
+				while(this.dispatcher.getState() != State.BDL_BLOCK_ADDING) { Api.sleepWait(); };
+				this.communicatorOutput.query("Block: 1");
+				this.communicatorOutput.query("Length: " + this.bundle.getLength(i));
+				this.communicatorOutput.query("");
+				this.communicatorOutput.query(this.bundle.getEncoded(i));
+				this.communicatorOutput.query("");
+				this.communicatorOutput.query("");
+				while(this.dispatcher.getState() != State.BLOCK_ADDED) { Api.sleepWait(); };
+			}
+		}
+
 		this.communicatorOutput.query("bundle send");
 		while(this.dispatcher.getState() != State.BDL_SENT) { Api.sleepWait(); };
-		
+
 		Sender.log.fine("Sending finished with:" + this.bundle);
 	}
 }
