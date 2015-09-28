@@ -188,11 +188,14 @@ public class Dispatcher implements Observer {
 		PLD_BUFFERED(12),
 		BDL_READY(13),
 		BDL_DELIVERED(14),
+		BLOCK_ADDED(15),
 		
 		SENDING(20),
 		PUTTING(21),
 		BDL_REGISTERED(22),
-		BDL_SENT(23);
+		BDL_SENT(23),
+		BDL_BLOCK_ADDING(24);
+
 		public final int value;
 
 		State(int value) {
@@ -211,7 +214,15 @@ public class Dispatcher implements Observer {
 			case 10: return "BDL_LOADED";
 			case 11: return "INFO_BUFFERED";
 			case 12: return "PLD_BUFFERED";
+			case 13: return "BDL_READY";
+			case 14: return "BDL_DELIVERED";
+			case 15: return "BLOCK_ADDED";
 			case 19: return "BDL_READY";
+			case 20: return "SENDING";
+			case 21: return "PUTTING";
+			case 22: return "BDL_REGISTERED";
+			case 23: return "BDL_SENT";
+			case 24: return "BDL_BLOCK_ADDING";
 			default: return ("UNKNOWN: " + this.value);
 			}
 		}
