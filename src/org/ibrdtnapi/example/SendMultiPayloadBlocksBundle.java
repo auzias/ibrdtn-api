@@ -19,7 +19,8 @@ public class SendMultiPayloadBlocksBundle {
         	bundle.addEncoded("SGkhIE15IG5hbWUgaXMgTWFlbCBBdXppYXMK");//Hi!
         	bundle.addEncoded("TXkgZW1haWwgaXMgaGlAYXV6aWFzLm5ldAo=");//My email
         	bpApp.send(bundle);
-        	System.out.println(i + " has been sent");
+        	System.out.println("#" + i + " has been sent:");
+        	System.out.println(bundle);
         }
 	}
 }
