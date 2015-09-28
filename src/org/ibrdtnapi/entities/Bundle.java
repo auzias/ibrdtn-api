@@ -5,6 +5,7 @@
 package org.ibrdtnapi.entities;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import sun.misc.BASE64Decoder;
@@ -24,8 +25,8 @@ public class Bundle {
 	private String reportto = null;
 	private String custodian = null;
 	private int lifetime = 0;
-	private String encoded = null;
-	private byte[] decoded = null;
+	private ArrayList<String> encoded = new ArrayList<String>();
+	private ArrayList<byte[]> decoded = new ArrayList<byte[]>();
 
 	public Bundle() {
 
@@ -40,7 +41,7 @@ public class Bundle {
 
 	public Bundle(String destination, byte[] payloadDecoded) {
 		this.destination = destination;
-		this.setDecoded(payloadDecoded);
+		this.addDecoded(payloadDecoded);
 	}
 
 	//Deep copy constructor:
@@ -58,7 +59,7 @@ public class Bundle {
 			this.custodian = new String(bundle.custodian);
 		this.lifetime = bundle.lifetime;
 		if(bundle.encoded != null) //It could be shorter to copy the value instead of base64-calculating it again
-			this.setEncoded(new String(bundle.encoded));
+			this.setEncoded(bundle.encoded);
 	}
 
 	public long getTimestamp() {
@@ -127,12 +128,17 @@ public class Bundle {
 		str.append("" + ((this.source == null) ? "source:none" : this.source));
 		str.append(" -> " + ((this.destination == null) ? "destnt:none" : this.destination));
 		str.append(" @" + this.timestamp);
-		str.append(", data");
-		str.append("(" + ((this.getLength() == 0) ? "X" : this.getLength()) + "):");
-		if(this.encoded != null)
-			str.append("" + this.encoded);
-		if(this.decoded != null)
-			str.append("#" + new String(this.decoded) + "#");
+		str.append(", data(");
+		
+		if(this.encoded.size() != 0) {
+			for(int i = 0; i < this.encoded.size(); i++) {	
+				str.append(((this.getLength(i) == 0) ? "X" : this.getLength(i)) + "):");
+				str.append("" + this.encoded.get(i));
+				str.append("#" + new String(this.decoded.get(i)) + "#");
+			}
+		}
+
+		str.append(")");
 
 		return str.toString();
 	}
@@ -141,34 +147,37 @@ public class Bundle {
 		this.destination = eid;
 	}
 
-	public int getLength() {
-		return (this.decoded != null) ? this.decoded.length : 0;
+	public int getLength(int block) {
+		return (this.decoded.get(block) != null) ? this.decoded.get(block).length : 0;
 	}
 
-	public void setEncoded(String encoded) {
-		this.encoded  = new String(encoded);
-		try {
-			this.decoded = new BASE64Decoder().decodeBuffer(this.encoded);
-		} catch (IOException e) {
-			Bundle.log.warning("Could not base64::decode() the payload of the bundle:" + this + ". " + e.getMessage());
+	public void setEncoded(ArrayList<String> encoded) {
+		for(String encodedBlock : encoded) {
+			this.encoded.add(encodedBlock);
+
+			try {
+				this.decoded.add(new BASE64Decoder().decodeBuffer(encodedBlock));
+			} catch (IOException e) {
+				Bundle.log.warning("Could not base64::decode() the payload of the bundle:" + this + ". " + e.getMessage());
+			}
 		}
 	}
 
-	public void setDecoded(byte[] decoded) {
-		this.decoded  = decoded;
-		this.encoded = new String(new BASE64Encoder().encodeBuffer(this.decoded)).trim();
+	public void addDecoded(byte[] decoded) {
+		this.decoded.add(decoded);
+		this.encoded.add(new String(new BASE64Encoder().encodeBuffer(decoded)).trim());
 	}
 
-	public int getDataLength() {
-		return this.decoded.length;
+	public int getDataLength(int block) {
+		return this.decoded.get(block).length;
 	}
 
-	public String getEncoded() {
-		return this.encoded;
+	public String getEncoded(int block) {
+		return this.encoded.get(block);
 	}
 
-	public byte[] getDecoded() {
-		return this.decoded;
+	public byte[] getDecoded(int block) {
+		return this.decoded.get(block);
 	}
 
 	/**************************************************************************
