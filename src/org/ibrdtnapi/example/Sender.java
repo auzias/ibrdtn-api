@@ -5,6 +5,7 @@
 package org.ibrdtnapi.example;
 
 import org.ibrdtnapi.BpApplication;
+import org.ibrdtnapi.entities.Bundle;
 
 /**
  * 
@@ -14,17 +15,14 @@ import org.ibrdtnapi.BpApplication;
  * received bundle.
  *
  */
-public class Example {
+public class Sender {
 
 	public static void main(String[] args) throws InterruptedException {
 		String eid = "test";
         BpApplication bpApp = new BpApplication(eid);
         bpApp.setHandler(new PrintingHandler());
-        System.out.println("Start:" + System.currentTimeMillis());
-        System.out.println("new one");
 
-        /*
-        int numberOfBundlesToSend = 2000;
+        int numberOfBundlesToSend = 2;
         String destination = "dtn://59/rcp";
         System.out.println("Hi! I'm " + bpApp.getURI() + " and I will send " + numberOfBundlesToSend + " bundles to " + destination);
 
@@ -32,6 +30,6 @@ public class Example {
         	Bundle bundle = new Bundle(destination, new String("" + i + "\n").getBytes());
         	bpApp.send(bundle);
         }
-*/
+
 	}
 }
