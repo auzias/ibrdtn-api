@@ -4,7 +4,6 @@
  */
 package org.ibrdtnapi.entities;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -33,11 +32,13 @@ public class Bundle {
 		this.sequenceNumber = blockNumber;
 		this.source = source;
 		this.destination = destination;
+		Bundle.log.finer("Bundle created with long constructor");
 	}
 
 	public Bundle(String destination, byte[] payloadDecoded) {
 		this.destination = destination;
 		this.addDecoded(payloadDecoded);
+		Bundle.log.finer("Bundle created with destination/decoded-data constructor");
 	}
 
 	//Deep copy constructor:
@@ -56,6 +57,7 @@ public class Bundle {
 		this.lifetime = bundle.lifetime;
 		if(bundle.payloadBlocks.size() > 0) //It could be shorter to copy the value instead of base64-calculating it again
 			payloadBlocks.addAll(bundle.payloadBlocks);
+		Bundle.log.finer("Bundle created with deep-copy constructor");
 	}
 
 	public long getTimestamp() {
