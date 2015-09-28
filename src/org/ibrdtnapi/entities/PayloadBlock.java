@@ -33,7 +33,7 @@ public class PayloadBlock {
 	}
 
 	public int getLength() {
-		return encoded.length();
+		return decoded.length;
 	}
 
 	public void setEncoded(String encoded) {
