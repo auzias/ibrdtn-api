@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 /**
  * The class Bundle represents bundle with ONLY ONE SINGLE BLOCK.  
  *
@@ -25,8 +22,7 @@ public class Bundle {
 	private String reportto = null;
 	private String custodian = null;
 	private int lifetime = 0;
-	private ArrayList<String> encoded = new ArrayList<String>();
-	private ArrayList<byte[]> decoded = new ArrayList<byte[]>();
+	private ArrayList<PayloadBlock> payloadBlocks = new ArrayList<PayloadBlock>();
 
 	public Bundle() {
 
@@ -58,8 +54,8 @@ public class Bundle {
 		if(bundle.custodian != null)
 			this.custodian = new String(bundle.custodian);
 		this.lifetime = bundle.lifetime;
-		if(bundle.encoded != null) //It could be shorter to copy the value instead of base64-calculating it again
-			this.setEncoded(bundle.encoded);
+		if(bundle.payloadBlocks.size() > 0) //It could be shorter to copy the value instead of base64-calculating it again
+			payloadBlocks.addAll(bundle.payloadBlocks);
 	}
 
 	public long getTimestamp() {
@@ -129,15 +125,10 @@ public class Bundle {
 		str.append(" -> " + ((this.destination == null) ? "destnt:none" : this.destination));
 		str.append(" @" + this.timestamp);
 		str.append(", data(");
-		
-		if(this.encoded.size() != 0) {
-			for(int i = 0; i < this.encoded.size(); i++) {	
-				str.append(((this.getLength(i) == 0) ? "X" : this.getLength(i)) + "):");
-				str.append("" + this.encoded.get(i));
-				str.append("#" + new String(this.decoded.get(i)) + "#");
-			}
-		}
 
+		for (PayloadBlock payloadBlock : payloadBlocks) {
+			str.append(payloadBlock.toString() + ",");
+		}
 		str.append(")");
 
 		return str.toString();
@@ -148,36 +139,46 @@ public class Bundle {
 	}
 
 	public int getLength(int block) {
-		return (this.decoded.get(block) != null) ? this.decoded.get(block).length : 0;
+		int length = 0;
+
+		try {
+			length = this.payloadBlocks.get(block).getLength();
+		} catch (IndexOutOfBoundsException e) {
+			return length;
+		}
+
+		return length;
 	}
 
-	public void setEncoded(ArrayList<String> encoded) {
-		for(String encodedBlock : encoded) {
-			this.encoded.add(encodedBlock);
-
-			try {
-				this.decoded.add(new BASE64Decoder().decodeBuffer(encodedBlock));
-			} catch (IOException e) {
-				Bundle.log.warning("Could not base64::decode() the payload of the bundle:" + this + ". " + e.getMessage());
-			}
-		}
+	public void addEncoded(String encoded) {
+		this.payloadBlocks.add(new PayloadBlock(encoded));
 	}
 
 	public void addDecoded(byte[] decoded) {
-		this.decoded.add(decoded);
-		this.encoded.add(new String(new BASE64Encoder().encodeBuffer(decoded)).trim());
-	}
-
-	public int getDataLength(int block) {
-		return this.decoded.get(block).length;
+		this.payloadBlocks.add(new PayloadBlock(decoded));
 	}
 
 	public String getEncoded(int block) {
-		return this.encoded.get(block);
+		String ret = null;
+		try {
+			ret = new String(this.payloadBlocks.get(block).getEncoded());
+		} catch (IndexOutOfBoundsException e) {
+			ret = new String("");
+		}
+		return ret;
 	}
 
 	public byte[] getDecoded(int block) {
-		return this.decoded.get(block);
+		byte[] src = null;
+		byte[] decoded = null;
+		try {
+			src = this.payloadBlocks.get(block).getDecoded();
+			decoded = new byte[src.length];
+			System.arraycopy(src, 0, decoded, 0, src.length);
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
+		return decoded;
 	}
 
 	/**************************************************************************
@@ -197,5 +198,9 @@ public class Bundle {
 
 	public boolean isSingleFlag(int flag) {
 		return ((this.flags & flag) == flag);
+	}
+
+	public int getNumberOfBlocks() {
+		return this.payloadBlocks.size();
 	}
 }
