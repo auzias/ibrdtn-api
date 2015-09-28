@@ -18,7 +18,7 @@ import org.ibrdtnapi.entities.Bundle;
 public class Sender {
 
 	public static void main(String[] args) throws InterruptedException {
-		String eid = "test";
+		String eid = "Sender";
         BpApplication bpApp = new BpApplication(eid);
         bpApp.setHandler(new PrintingHandler());
 
