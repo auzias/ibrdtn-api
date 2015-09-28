@@ -53,9 +53,9 @@ public class PayloadBlock {
 
 	public String toString() {
 		StringBuilder str = new StringBuilder();
-		str.append(((this.getLength() == 0) ? "X" : this.getLength()) + "):");
-		str.append("" + this.encoded);
-		str.append("#" + new String(this.decoded) + "#");
+		str.append(((this.getLength() == 0) ? "X" : this.getLength()) + ":");
+		str.append("" + new String(this.decoded).trim());
+		str.append("#" + this.encoded + "#");
 		return str.toString();
 	}
 }
