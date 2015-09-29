@@ -39,6 +39,7 @@ Here is a full example:
         bpApp.setHandler(new PrintingHandler());//.. and processed by this handler.
 
         Bundle bundle = new Bundle("dtn://logger/X", "Payload\n".getBytes());
+	//To add a payload block into the bundle use: boolean bundle.[addDecoded(byte[] data)|addEncoded(String data)]
         //This will send the bundle from dtn://actuator/app to dtn://logger/X, with the payload "Payload\n".
         bpApp.send(bundle);
         }
@@ -86,5 +87,6 @@ To-do
  - [x] Test reception performance.
  - [x] Test registration performance.
  - [x] Test emission performance.
+ - [x] Multi-payload blocks bundle (Api.MAX_PAYLOAD_BLOCK is the limit of the payload block number).
  - [ ] :bug: Solve the bug when an application is stopped, and started back.
  - [ ] CPU usage friendly.

@@ -7,6 +7,8 @@ package org.ibrdtnapi.entities;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.ibrdtnapi.Api;
+
 /**
  * The class Bundle represents bundle with ONLY ONE SINGLE BLOCK.  
  *
@@ -152,12 +154,22 @@ public class Bundle {
 		return length;
 	}
 
-	public void addEncoded(String encoded) {
-		this.payloadBlocks.add(new PayloadBlock(encoded));
+	public boolean addEncoded(String encoded) {
+		if(this.payloadBlocks.size() >= Api.MAX_PAYLOAD_BLOCK)
+			return false;
+		else {
+			this.payloadBlocks.add(new PayloadBlock(encoded));
+			return true;
+		}
 	}
 
-	public void addDecoded(byte[] decoded) {
-		this.payloadBlocks.add(new PayloadBlock(decoded));
+	public boolean addDecoded(byte[] decoded) {
+		if(this.payloadBlocks.size() >= Api.MAX_PAYLOAD_BLOCK)
+			return false;
+		else {
+			this.payloadBlocks.add(new PayloadBlock(decoded));
+			return true;
+		}
 	}
 
 	public String getEncoded(int block) {
