@@ -189,6 +189,8 @@ public class Dispatcher implements Observer {
 		BDL_READY(13),
 		BDL_DELIVERED(14),
 		BLOCK_ADDED(15),
+		BDL_INFO(16),
+		PLD_BUFFERING(17),
 		
 		SENDING(20),
 		PUTTING(21),
@@ -211,13 +213,16 @@ public class Dispatcher implements Observer {
 			case  2: return "IDLE";
 			case  3: return "FETCHING";
 			case  4: return "FETCHING_READY";
+
 			case 10: return "BDL_LOADED";
 			case 11: return "INFO_BUFFERED";
 			case 12: return "PLD_BUFFERED";
 			case 13: return "BDL_READY";
 			case 14: return "BDL_DELIVERED";
 			case 15: return "BLOCK_ADDED";
-			case 19: return "BDL_READY";
+			case 16: return "BDL_INFO";
+			case 17: return "PLD_BUFFERING";
+
 			case 20: return "SENDING";
 			case 21: return "PUTTING";
 			case 22: return "BDL_REGISTERED";

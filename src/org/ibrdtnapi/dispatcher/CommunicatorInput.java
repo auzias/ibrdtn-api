@@ -55,33 +55,29 @@ public class CommunicatorInput implements Runnable {
 	@Override
 	public void run() {
 		String str;
+		final int payloadLinesToBufferize = 5;
+		int linesCount = 0;
 		try {
-			int lineCount = 0;
 			while ((str = this.br.readLine()) != null) {
 				this.log(str);
-				
 				//First thing first, we check if it's a 602 notify
 				if(str.startsWith("602 NOTIFY BUNDLE")) {
 					this.notifyBundle(str);
-				} else if(this.dispatcher.getState() != State.BDL_LOADED
-					   && this.dispatcher.getState() != State.INFO_BUFFERED) {
-					this.parse(str);
+				//Then, if bundle is loaded (and info are sent), bufferize them:
 				}  else if(this.dispatcher.getState() == State.BDL_LOADED) {
 					this.buffer.append(str + "\n");
-					if(str.startsWith("Encoding:"))	this.dispatcher.setState(State.INFO_BUFFERED);
-				} else if(this.dispatcher.getState() == State.INFO_BUFFERED){
-					if(str.startsWith("602 NOTIFY BUNDLE")) {
-						this.notifyBundle(str);
-					}
-					if(!str.startsWith("200 BUNDLE LOADED")
-					&& !str.startsWith("200 PAYLOAD GET")) {
-						this.buffer.append(str + "\n");
-						lineCount++;
-					}
-					if(lineCount >= 5) {
-						lineCount = 0;
+					if(str.startsWith("Blocks: "))
+						this.dispatcher.setState(State.INFO_BUFFERED);
+				//Then, if payload is sent, bufferize it:
+				}  else if(this.dispatcher.getState() == State.PLD_BUFFERING) {
+					this.buffer.append(str + "\n");
+					linesCount++;
+					if(linesCount == payloadLinesToBufferize) {
 						this.dispatcher.setState(State.PLD_BUFFERED);
+						linesCount = 0;
 					}
+				} else {
+					this.parse(str);
 				}
 			}
 		} catch (IOException e) {
@@ -127,6 +123,10 @@ public class CommunicatorInput implements Runnable {
 			this.dispatcher.setState(State.BDL_REGISTERED);
 		} else if(str.startsWith("200 BUNDLE SENT")) {
 			this.dispatcher.setState(State.BDL_SENT);
+		} else if(str.startsWith("200 BUNDLE INFO")) {
+			this.dispatcher.setState(State.BDL_INFO);
+		} else if(str.startsWith("200 PAYLOAD GET")) {
+			this.dispatcher.setState(State.PLD_BUFFERING);
 		} else if(str.startsWith("200 NODENAME")) {
 			this.dispatcher.setNodeName(str.split(" ")[2]);
 		} else if(str.startsWith("100 BUNDLE BLOCK ADD")) {

@@ -43,10 +43,13 @@ public class Fetcher implements Runnable {
 			while(this.dispatcher.getState() != State.BDL_LOADED) { Api.sleepWait(); };
 			//Request to load the meta-data
 			this.communicatorOutput.query("bundle info");
+			//Wait for the INFO to be sent:
 			while(this.dispatcher.getState() != State.INFO_BUFFERED) { Api.sleepWait(); };
 			//Parse the meta-data
-			String buffer = this.communicatorInput.getBuffer();
+			String buffer = new String(this.communicatorInput.getBuffer());
+			//Fetcher.log.finest("Buffer\n::::::::::::::::::\n" + buffer + "\n::::::::::::::::::");
 			String[] meta = buffer.split("\n");
+			int numberOfBlocks = 1;
 			for(String s : meta) {
 				if(s.startsWith("Processing flags:"))
 					this.bundle.setFlags(Integer.parseInt(s.split(" ")[2]));
@@ -64,22 +67,25 @@ public class Fetcher implements Runnable {
 					this.bundle.setCustodian(s.split(" ")[1]);
 				else if(s.startsWith("Lifetime:"))
 					this.bundle.setLifetime(Integer.parseInt(s.split(" ")[1]));
-//				else if(s.startsWith("Length:"))
-//					this.bundle.setLength(Integer.parseInt(s.split(" ")[1]));
+				else if(s.startsWith("Blocks:"))
+					numberOfBlocks = Integer.parseInt(s.split(" ")[1]);
 			}
-			//Request to load the payload (base64 encoded)
-			this.communicatorOutput.query("payload 0 get 0 " + this.bundle.getLength());
-			while(this.dispatcher.getState() != State.PLD_BUFFERED) { Api.sleepWait(); };
-			//Set the encoded payload to the bundle
-			buffer = this.communicatorInput.getBuffer();
-			String[] payloadBuffer = buffer.split("\n");
-			int i = 0;
-			for(String s : payloadBuffer) {
-				if(!s.startsWith("Encoding:"))
-					i++;
+			for(int payloadBlock = 0; payloadBlock < numberOfBlocks; payloadBlock++) {
+				//Request to load the payload (base64 encoded)
+				this.communicatorOutput.query("payload " + payloadBlock +" get 0 0");
+				while(this.dispatcher.getState() != State.PLD_BUFFERED) { Api.sleepWait(); };
+				//Set the encoded payload to the bundle
+				buffer = new String(this.communicatorInput.getBuffer());
+				String[] payloadBuffer = buffer.split("\n");
+				int line = 0;
+				for(String s : payloadBuffer) {
+					if(!s.startsWith("Encoding:"))
+						line++;
+				}
+				String encoded = payloadBuffer[line];
+				this.bundle.addEncoded(encoded);
 			}
-			String encoded = payloadBuffer[i];
-			this.bundle.setEncoded(encoded);
+
 			//Set the bundle to the dispatcher, so the dispatcher can add it in the Fifo for the app
 			this.dispatcher.setFetchingBundle(this.bundle);
 			this.dispatcher.setState(State.BDL_READY);
