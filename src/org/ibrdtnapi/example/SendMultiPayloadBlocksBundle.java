@@ -10,7 +10,7 @@ public class SendMultiPayloadBlocksBundle {
         BpApplication bpApp = new BpApplication(eid);
         bpApp.setHandler(new PrintingHandler());
 
-        int numberOfBundlesToSend = 1;
+        int numberOfBundlesToSend = 1000;
         String destination = "dtn://59/Sender";
         System.out.println("Hi! I'm " + bpApp.getURI() + " and I will send " + numberOfBundlesToSend + " bundles to " + destination);
 

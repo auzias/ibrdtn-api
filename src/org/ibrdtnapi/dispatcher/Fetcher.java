@@ -77,6 +77,7 @@ public class Fetcher implements Runnable {
 				//Set the encoded payload to the bundle
 				buffer = new String(this.communicatorInput.getBuffer());
 				String[] payloadBuffer = buffer.split("\n");
+
 				int line = 0;
 				for(String s : payloadBuffer) {
 					if(!s.startsWith("Encoding:"))
@@ -84,6 +85,7 @@ public class Fetcher implements Runnable {
 				}
 				String encoded = payloadBuffer[line];
 				this.bundle.addEncoded(encoded);
+				this.dispatcher.setState(State.PLD_CONSUMED);
 			}
 
 			//Set the bundle to the dispatcher, so the dispatcher can add it in the Fifo for the app
