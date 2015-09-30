@@ -54,6 +54,7 @@ See the [architecture.svg](imgs/architecture.svg) to get a visual overview.
 
 ##### Multi-payload blocks considerations
 Bundles can have multiple payload blocks. However if a bundle gathers too much data in its different blocks and is bigger than the MTU of the Convergence Layer fragmentation will happen. We may want to avoid this (for many reasons) and a payload block is added **only** if it is the first payload block and if the new payload block weight summed to the current payload blocks weight is less than `Api.MAX_PAYLOAD_WEIGHT`.
+Very important too, the test done when a payload block is requested to be added is done too when bundle are **received**. This test can lead to refuse a payload block for **received** bundle (that may be bigger than `Api.MAX_PAYLOAD_WEIGHT`). This is a bug, `Bundle` should have a boolean set when it is a **received** bundle so the test is not performed in this case (and the `Sender` should test it before sending the bundle).
 
 Performance
 -----------
