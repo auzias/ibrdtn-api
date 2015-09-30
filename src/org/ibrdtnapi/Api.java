@@ -33,7 +33,7 @@ public class Api {
 	public static final int REQUEST_REPORT_OF_BUNDLE_FORWARDING = (1 << 0x10);
 	public static final int REQUEST_REPORT_OF_BUNDLE_DELIVERY = (1 << 0x11);
 	public static final int REQUEST_REPORT_OF_BUNDLE_DELETION = (1 << 0x12);
-	//Sum(foreach(payloadBlocks.weight)) =< MAX_PAYLOAD_WEIGHT (MAX_PAYLOAD_WEIGHT should be the MTU of the Convergence Layer)
+	//Sum(foreach(payloadBlocks.weight)) =< MAX_PAYLOAD_WEIGHT (MAX_PAYLOAD_WEIGHT is set arbitrarily to avoid huge bundle)
 	public static final int MAX_PAYLOAD_WEIGHT = 1200;
 
 	public enum ClassOfService {
