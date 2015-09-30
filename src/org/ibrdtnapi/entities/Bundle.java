@@ -36,17 +36,20 @@ public class Bundle {
 		this.source = source;
 		this.destination = destination;
 		Bundle.log.finer("Bundle created with long constructor");
+		this.setClassOfService(Api.ClassOfService.EXPEDITED);
 	}
 
 	public Bundle(String destination, byte[] payloadDecoded) {
 		this.destination = destination;
 		this.addDecoded(payloadDecoded);
 		Bundle.log.finer("Bundle created with destination/decoded-data constructor");
+		this.setClassOfService(Api.ClassOfService.EXPEDITED);
 	}
 
 	public Bundle(String destination) {
 		this.destination = destination;
 		Bundle.log.finer("Bundle created with destination/decoded-data constructor");
+		this.setClassOfService(Api.ClassOfService.EXPEDITED);
 	}
 
 	//Deep copy constructor:
@@ -218,8 +221,23 @@ public class Bundle {
 		this.flags += flag;
 	}
 
-	public void clearSingleFlag(int flag) {
-		this.flags -= flag;
+	public void setClassOfService(Api.ClassOfService classOfService) {
+		//Clear the ClassOfService:
+		this.flags &= (0 << 0x07);
+		this.flags &= (0 << 0x08);
+		//Then set the ClassOfService by addition:
+		this.flags += classOfService.getValue();
+	}
+
+	public boolean clearSingleFlag(int flag) {
+		boolean changed = true;
+		//We don't want any negative flag.
+		if ( (this.flags - flag) >= 0 ) {
+			this.flags -= flag;
+			return changed;
+		} else {
+			return false;
+		}
 	}
 
 	public boolean isSingleFlag(int flag) {
