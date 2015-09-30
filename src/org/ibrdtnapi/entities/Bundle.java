@@ -164,8 +164,8 @@ public class Bundle {
 		//If the encoded data size added to the current payloadWeigth ..
 		// .. is bigger than the Api.MAX_PAYLOAD_WEIGHT then it is NOT added ..
 		// .. unless this is the *first* payload block
-		if ( (this.payloadWeigth != 0)
-				|| (this.payloadWeigth + encoded.length()) > Api.MAX_PAYLOAD_WEIGHT)
+		if ( (this.payloadBlocks.size() != 0)
+				&& (this.payloadWeigth + encoded.length()) > Api.MAX_PAYLOAD_WEIGHT)
 			return false;
 		else {
 		// .. Otherwise it payloadWeigth is updated and the encoded data added. 
