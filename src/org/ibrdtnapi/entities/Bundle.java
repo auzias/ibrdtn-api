@@ -24,6 +24,7 @@ public class Bundle {
 	private String custodian = null;
 	private int lifetime = 0;
 	private ArrayList<PayloadBlock> payloadBlocks = new ArrayList<PayloadBlock>();
+	private int payloadWeigth = 0;
 
 	public Bundle() {
 
@@ -40,6 +41,11 @@ public class Bundle {
 	public Bundle(String destination, byte[] payloadDecoded) {
 		this.destination = destination;
 		this.addDecoded(payloadDecoded);
+		Bundle.log.finer("Bundle created with destination/decoded-data constructor");
+	}
+
+	public Bundle(String destination) {
+		this.destination = destination;
 		Bundle.log.finer("Bundle created with destination/decoded-data constructor");
 	}
 
@@ -155,16 +161,22 @@ public class Bundle {
 	}
 
 	public boolean addEncoded(String encoded) {
-		if(this.payloadBlocks.size() >= Api.MAX_PAYLOAD_BLOCK)
+		//If the encoded data size added to the current payloadWeigth ..
+		// .. is bigger than the Api.MAX_PAYLOAD_WEIGHT then it is NOT added ..
+		// .. unless this is the *first* payload block
+		if ( (this.payloadWeigth != 0)
+				|| (this.payloadWeigth + encoded.length()) > Api.MAX_PAYLOAD_WEIGHT)
 			return false;
 		else {
+		// .. Otherwise it payloadWeigth is updated and the encoded data added. 
+			this.payloadWeigth += encoded.length();
 			this.payloadBlocks.add(new PayloadBlock(encoded));
 			return true;
 		}
 	}
 
 	public boolean addDecoded(byte[] decoded) {
-		if(this.payloadBlocks.size() >= Api.MAX_PAYLOAD_BLOCK)
+		if(this.payloadBlocks.size() >= Api.MAX_PAYLOAD_WEIGHT)
 			return false;
 		else {
 			this.payloadBlocks.add(new PayloadBlock(decoded));

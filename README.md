@@ -52,6 +52,9 @@ The two main classes are [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.ja
 
 See the [architecture.svg](imgs/architecture.svg) to get a visual overview.
 
+##### Multi-payload blocks considerations
+Bundles can have multiple payload blocks. However if a bundle gathers too much data in its different blocks and is bigger than the MTU of the Convergence Layer fragmentation will happen. We may want to avoid this (for many reasons) and a payload block is added **only** if it is the first payload block and if the new payload block weight summed to the current payload blocks weight is less than `Api.MAX_PAYLOAD_WEIGHT`.
+
 Performance
 -----------
 Tests performed on a localhost with a i5-3570 CPU @ 3.40GHz, running Debian 3.2.68-1+deb7u2, IBR-DTN daemon 0.12.1 (build 7c220eb) and Java 1.7 (OpenJDK Runtime Environment (IcedTea 2.5.5) (7u79-2.5.5-1~deb7u1)).
