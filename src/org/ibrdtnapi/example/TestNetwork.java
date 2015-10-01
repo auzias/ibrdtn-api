@@ -1,5 +1,6 @@
 package org.ibrdtnapi.example;
 
+import org.ibrdtnapi.Api;
 import org.ibrdtnapi.BpApplication;
 import org.ibrdtnapi.entities.Bundle;
 
@@ -14,9 +15,9 @@ public class TestNetwork {
 			System.exit(-1);
 		}*/
         final String _destination = "dtn://59/rcp";
-        final int _numberOfBlocks = 5;
-        final int _numberOfChar = 9;
-        final int _numberOfBundlesToSend = 100;
+        final int _numberOfBlocks = 2;
+        final int _numberOfChar = 4;
+        final int _numberOfBundlesToSend = 1;
 
         
         String eid = "TestNetwork";
@@ -47,6 +48,7 @@ public class TestNetwork {
         
         boolean ok = true;
         Bundle bundle = new Bundle(_destination);
+        bundle.clearSingleFlag(Api.DESTINATION_IS_SINGLETON);
         for(int payloadBlock = 0; payloadBlock < _numberOfBlocks; payloadBlock++) {
         	ok &= bundle.addEncoded(payloadEncoded);
         }
