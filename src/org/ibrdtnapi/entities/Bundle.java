@@ -36,20 +36,20 @@ public class Bundle {
 		this.source = source;
 		this.destination = destination;
 		Bundle.log.finer("Bundle created with long constructor");
-		this.setClassOfService(Api.ClassOfService.EXPEDITED);
+		this.setDefaultFlags();
 	}
 
 	public Bundle(String destination, byte[] payloadDecoded) {
 		this.destination = destination;
 		this.addDecoded(payloadDecoded);
+		this.setDefaultFlags();
 		Bundle.log.finer("Bundle created with destination/decoded-data constructor");
-		this.setClassOfService(Api.ClassOfService.EXPEDITED);
 	}
 
 	public Bundle(String destination) {
 		this.destination = destination;
 		Bundle.log.finer("Bundle created with destination/decoded-data constructor");
-		this.setClassOfService(Api.ClassOfService.EXPEDITED);
+		this.setDefaultFlags();
 	}
 
 	//Deep copy constructor:
@@ -217,8 +217,16 @@ public class Bundle {
 		this.flags = flags;
 	}
 
-	public void setSingleFlag(int flag) {
-		this.flags += flag;
+	public void setSingleFlag(Api.Flags flag) {
+		this.flags |= (1 << flag.getPosition());
+	}
+
+	public void clearSingleFlag(Api.Flags flag) {
+		this.flags &= (0 << flag.getPosition());
+	}
+
+	public int getNumberOfBlocks() {
+		return this.payloadBlocks.size();
 	}
 
 	public void setClassOfService(Api.ClassOfService classOfService) {
@@ -229,22 +237,8 @@ public class Bundle {
 		this.flags += classOfService.getValue();
 	}
 
-	public boolean clearSingleFlag(int flag) {
-		boolean changed = true;
-		//We don't want any negative flag.
-		if ( (this.flags - flag) >= 0 ) {
-			this.flags -= flag;
-			return changed;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean isSingleFlag(int flag) {
-		return ((this.flags & flag) == flag);
-	}
-
-	public int getNumberOfBlocks() {
-		return this.payloadBlocks.size();
+	private void setDefaultFlags() {
+		this.setClassOfService(Api.ClassOfService.DEFAULT);
+		this.setSingleFlag(Api.Flags.DESTINATION_IS_SINGLETON);
 	}
 }

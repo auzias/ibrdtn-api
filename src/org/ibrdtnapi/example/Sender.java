@@ -23,7 +23,7 @@ public class Sender {
         bpApp.setHandler(new PrintingHandler());
 
         int numberOfBundlesToSend = 2;
-        String destination = "dtn://59/rcp";
+        String destination = "dtn://59/tt";
         System.out.println("Hi! I'm " + bpApp.getURI() + " and I will send " + numberOfBundlesToSend + " bundles to " + destination);
 
         for (int i = 0; i < numberOfBundlesToSend; i++) {

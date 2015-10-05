@@ -35,7 +35,7 @@ public class Sender implements Runnable {
 		while(this.dispatcher.getState() != State.PUTTING) { Api.sleepWait(); };
 		this.communicatorOutput.query("Source: api:me");
 		this.communicatorOutput.query("Destination: " + this.bundle.getDestination());
-		this.communicatorOutput.query("Processing flags: " + this.bundle.getFlags());
+		this.communicatorOutput.query("Processing flags: "+ this.bundle.getFlags());
 		this.communicatorOutput.query("Timestamp: " + this.bundle.getTimestamp());
 		String reportto = (this.bundle.getReportto() != null) ? this.bundle.getReportto() : "dtn:none"; 
 		this.communicatorOutput.query("Reportto: " + reportto );
