@@ -48,7 +48,7 @@ public class TestNetwork {
         
         boolean ok = true;
         Bundle bundle = new Bundle(_destination);
-        bundle.clearSingleFlag(Api.DESTINATION_IS_SINGLETON);
+        bundle.clearSingleFlag(Api.Flags.DESTINATION_IS_SINGLETON);
         for(int payloadBlock = 0; payloadBlock < _numberOfBlocks; payloadBlock++) {
         	ok &= bundle.addEncoded(payloadEncoded);
         }
