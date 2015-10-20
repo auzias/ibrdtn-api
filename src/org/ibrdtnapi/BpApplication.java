@@ -12,20 +12,16 @@ import org.ibrdtnapi.dispatcher.Dispatcher;
 import org.ibrdtnapi.entities.Bundle;
 import org.ibrdtnapi.entities.FifoBundleQueue;
 
-
 /**
  * 
- * To create an BpApp you will have to
- * extend this class and override "bundleReceived()".
+ * To create an BpApp you will have to extend this class and override
+ * "bundleReceived()".
  * 
- * To create a BpApp you need to choose an endpoint (name).
- * If your local node is name "dtn://localnode" and you want
- * the application to have an EID of "dtn://localnode/MyAppEID"
- * create the BpApp as it:
- * <code>
+ * To create a BpApp you need to choose an endpoint (name). If your local node
+ * is name "dtn://localnode" and you want the application to have an EID of
+ * "dtn://localnode/MyAppEID" create the BpApp as it: <code>
  * 		MyApp myApp = new MyApp("MyAppEID");
- * </code>
- * where MyApp is a class extending BpApplication.
+ * </code> where MyApp is a class extending BpApplication.
  *
  */
 public class BpApplication implements Observer {
@@ -36,11 +32,13 @@ public class BpApplication implements Observer {
 	private ArrayList<Bundle> pendingBundle = new ArrayList<Bundle>();
 
 	public BpApplication() {
-		
+
 	}
 
 	public void setEid(String eid) {
-		if(eid == null || eid.contains(" ")) throw new ApiException("The endpoint must be not null and not contain any space.");
+		if (eid == null || eid.contains(" "))
+			throw new ApiException(
+					"The endpoint must be not null and not contain any space.");
 		this.dispatcher = new Dispatcher(toSendBundles, this, eid);
 		this.toSendBundles.addObserver(dispatcher);
 		this.receivedBundles = dispatcher.getReceivedBundles();
@@ -57,20 +55,25 @@ public class BpApplication implements Observer {
 	}
 
 	public boolean send(Bundle bundle) {
-		if(this.dispatcher == null || bundle == null) return false;
-		//else the bundle is copied and added to the queue.
+		if (this.dispatcher == null || bundle == null)
+			return false;
+		// else the bundle is copied and added to the queue.
 		Bundle bdl = new Bundle(bundle);
 		return this.toSendBundles.enqueue(bdl);
 	}
 
 	@Override
 	public void update(Observable receivedBundles, Object o) {
-		if(this.receivedBundles == receivedBundles && !this.receivedBundles.isEmpty())
-			this.bundleReceived(((FifoBundleQueue)receivedBundles).dequeue());
+		if (this.receivedBundles == receivedBundles
+				&& !this.receivedBundles.isEmpty())
+			this.bundleReceived(((FifoBundleQueue) receivedBundles).dequeue());
 	}
 
 	public void stop() {
-		while(this.dispatcher.getState() != Dispatcher.State.IDLE) { Api.sleepWait(); };
+		while (this.dispatcher.getState() != Dispatcher.State.IDLE) {
+			Api.sleepWait();
+		}
+		;
 		this.dispatcher.stop();
 	}
 
@@ -87,7 +90,7 @@ public class BpApplication implements Observer {
 	}
 
 	public void bundleReceived(Bundle b) {
-		if(this.handler != null)
+		if (this.handler != null)
 			this.handler.onReceive(b);
 		else
 			this.pendingBundle.add(b);
