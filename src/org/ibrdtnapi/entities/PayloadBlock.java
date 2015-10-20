@@ -51,11 +51,18 @@ public class PayloadBlock {
 		this.encoded = new String(new BASE64Encoder().encodeBuffer(this.decoded)).trim();
 	}
 
-	public String toString() {
+	public String toString(boolean full) {
+
 		StringBuilder str = new StringBuilder();
 		str.append(((this.getLength() == 0) ? "X" : this.getLength()) + ":");
 		str.append("" + new String(this.decoded).trim());
-		str.append("#" + this.encoded + "#");
+		if (full) {
+			str.append("#" + this.encoded + "#");
+		}
 		return str.toString();
+	}
+
+	public String toString() {
+		return this.toString(false);
 	}
 }
