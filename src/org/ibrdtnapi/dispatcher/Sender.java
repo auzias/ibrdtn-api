@@ -36,7 +36,7 @@ public class Sender implements Runnable {
 		this.communicatorOutput.query("Source: api:me");
 		this.communicatorOutput.query("Destination: " + this.bundle.getDestination());
 		this.communicatorOutput.query("Processing flags: "+ this.bundle.getFlags());
-		this.communicatorOutput.query("Timestamp: " + this.bundle.getTimestamp());
+		this.communicatorOutput.query("Timestamp: " + ((this.bundle.getTimestamp() == 0) ? System.currentTimeMillis() : this.bundle.getTimestamp()));
 		String reportto = (this.bundle.getReportto() != null) ? this.bundle.getReportto() : "dtn:none"; 
 		this.communicatorOutput.query("Reportto: " + reportto );
 		String custodian = (this.bundle.getCustodian() != null) ? this.bundle.getCustodian() : "dtn:none"; 

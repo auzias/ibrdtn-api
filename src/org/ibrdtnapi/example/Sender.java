@@ -22,7 +22,7 @@ public class Sender {
         BpApplication bpApp = new BpApplication(eid);
         bpApp.setHandler(new PrintingHandler());
 
-        int numberOfBundlesToSend = 2;
+        int numberOfBundlesToSend = 0;
         String destination = "dtn://59/tt";
         System.out.println("Hi! I'm " + bpApp.getURI() + " and I will send " + numberOfBundlesToSend + " bundles to " + destination);
 
