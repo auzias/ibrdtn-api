@@ -45,6 +45,8 @@ Here is a full example:
         }
 ```
 
+Added to sending and receving bundles, the command `neighbor list` from the `protocol extended` is also available. To perform this method, call `List<String> BpApplication::getNeighborList()`.
+
 How does it work ?
 ------------------
 The two main classes are [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) and [BpApplication](src/org/ibrdtnapi/BpApplication.java). [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) is the class that manages the communication with the daemon through the two communicators (input and output). It notifies received bundles to the [BpApplication](src/org/ibrdtnapi/BpApplication.java) and sends bundles to the daemon on behalf of [BpApplication](src/org/ibrdtnapi/BpApplication.java). The [CommunicatorInput](src/org/ibrdtnapi/dispatcher/CommunicatorInput.java), among other classes, sets the state of the [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java). States are used so the [Dispatcher](src/org/ibrdtnapi/dispatcher/Dispatcher.java) does not send a bundle while fetching a received one.
@@ -92,5 +94,6 @@ To-do
  - [x] Test registration performance.
  - [x] Test emission performance.
  - [x] Multi-payload blocks bundle (Api.MAX_PAYLOAD_BLOCK is the limit of the payload block number).
+ - [x] Enable the `neighbor list` command.
  - [ ] :bug: Solve the bug when an application is stopped, and started back.
  - [ ] CPU usage friendly.
