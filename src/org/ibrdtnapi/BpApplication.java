@@ -5,6 +5,7 @@
 package org.ibrdtnapi;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -72,9 +73,14 @@ public class BpApplication implements Observer {
 	public void stop() {
 		while (this.dispatcher.getState() != Dispatcher.State.IDLE) {
 			Api.sleepWait();
-		}
-		;
+		};
 		this.dispatcher.stop();
+	}
+
+	public List<String> getNeighborList() {
+		ArrayList<String> list = new ArrayList<String>();
+		list.addAll(this.dispatcher.getNeighborList());
+		return list;
 	}
 
 	public String getEid() {

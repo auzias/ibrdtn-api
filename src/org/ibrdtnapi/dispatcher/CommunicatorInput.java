@@ -3,6 +3,8 @@ package org.ibrdtnapi.dispatcher;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.ibrdtnapi.Api;
@@ -30,6 +32,7 @@ public class CommunicatorInput implements Runnable {
 	private FifoBundleQueue toFetchBundles = new FifoBundleQueue();
 	private Dispatcher dispatcher = null;
 	private StringBuilder buffer = null;
+	private List<String> neighborList = new ArrayList<String>();
 
 
 	public CommunicatorInput(BufferedReader br, Dispatcher dispatcher) {
@@ -63,18 +66,27 @@ public class CommunicatorInput implements Runnable {
 				//First thing first, we check if it's a 602 notify
 				if(str.startsWith("602 NOTIFY BUNDLE")) {
 					this.notifyBundle(str);
-				//Then, if bundle is loaded (and info are sent), bufferize them:
+				//Otherwise, if bundle is loaded (and info are sent), bufferize them:
 				}  else if(this.dispatcher.getState() == State.BDL_LOADED) {
 					this.buffer.append(str + "\n");
 					if(str.startsWith("Blocks: "))
 						this.dispatcher.setState(State.INFO_BUFFERED);
-				//Then, if payload is sent, bufferize it:
+				//Otherwise, if payload is sent, bufferize it:
 				}  else if(this.dispatcher.getState() == State.PLD_BUFFERING) {
 					this.buffer.append(str + "\n");
 					linesCount++;
 					if(linesCount == payloadLinesToBufferize) {
 						this.dispatcher.setState(State.PLD_BUFFERED);
 						linesCount = 0;
+					}
+				//Otherwise, the neighbor list has been requested:
+				} else if(this.dispatcher.getState() == State.NEIGHBOR_LIST) {
+					//If the line is not empty, we add this neighbor
+					if(!str.trim().isEmpty()) {
+						this.neighborList.add(str);
+					//Otherwise, if the line is empty, the listing is done.
+					} else {
+						this.dispatcher.setState(State.NEIGHBOR_LISTED);
 					}
 				} else {
 					this.parse(str);
@@ -105,6 +117,13 @@ public class CommunicatorInput implements Runnable {
 		return ret;
 	}
 
+	public List<String> getNeighborList() {
+		List<String> list = new ArrayList<String>();
+		list.addAll(this.neighborList);
+		this.neighborList.clear();
+		return list;
+	}
+
 	private void parse(String str) {
 		if(str == null) {
 			throw new ApiException("Input string null.");
@@ -133,6 +152,8 @@ public class CommunicatorInput implements Runnable {
 			this.dispatcher.setState(State.BDL_BLOCK_ADDING);
 		} else if(str.startsWith("200 BUNDLE BLOCK ADD SUCCESSFUL")) {
 			this.dispatcher.setState(State.BLOCK_ADDED);
+		} else if(str.startsWith("200 NEIGHBOR LIST")) {
+			this.dispatcher.setState(State.NEIGHBOR_LIST);
 		}
 	}
 

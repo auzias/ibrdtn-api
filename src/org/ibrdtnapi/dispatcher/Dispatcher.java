@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
@@ -131,6 +132,8 @@ public class Dispatcher implements Observer {
 		this.setState(State.IDLE);
 	}
 
+	
+
 	private synchronized void fetch(Bundle bundle) {
 		//Wait to be ready to fetch next bundle
 		while(this.getState() != State.IDLE) { Api.sleepWait(); };
@@ -178,7 +181,7 @@ public class Dispatcher implements Observer {
 		DISCONNECTED(-1),	//Socket is not yet established
 
 		CONNECTED(0),		//Socket is established with the daemon
-		EXTENDED(1),		//The query 'protocol extended' returned '200 SWITCHED TO EXTENDED'
+		EXTENDED(1),		//The query 'protocol extended' returns '200 SWITCHED TO EXTENDED'
 		IDLE(2),
 		FETCHING(3),
 		FETCHING_READY(4),
@@ -197,7 +200,10 @@ public class Dispatcher implements Observer {
 		PUTTING(21),
 		BDL_REGISTERED(22),
 		BDL_SENT(23),
-		BDL_BLOCK_ADDING(24);
+		BDL_BLOCK_ADDING(24),
+		
+		NEIGHBOR_LIST(30),
+		NEIGHBOR_LISTED(31);
 
 		public final int value;
 
@@ -230,6 +236,10 @@ public class Dispatcher implements Observer {
 			case 22: return "BDL_REGISTERED";
 			case 23: return "BDL_SENT";
 			case 24: return "BDL_BLOCK_ADDING";
+
+			case 30: return "NEIGHBOR_LIST";
+			case 31: return "NEIGHBOR_LISTED";
+
 			default: return ("UNKNOWN: " + this.value);
 			}
 		}
@@ -263,5 +273,17 @@ public class Dispatcher implements Observer {
 
 	public String getNodeName() {
 		return this.nodeName;
+	}
+
+	public List<String> getNeighborList() {
+		//Wait for the endpoint to be idle
+		while(this.getState() != State.IDLE) { Api.sleepWait(); };
+		//Request the neighbor list
+		this.communicatorOutput.query("neighbor list");
+		//Wait for the list to be completed
+		while(this.getState() != State.NEIGHBOR_LISTED) { Api.sleepWait(); };
+		List<String> list = this.communicatorInput.getNeighborList();
+		this.setState(State.IDLE);
+		return list;
 	}
 }
