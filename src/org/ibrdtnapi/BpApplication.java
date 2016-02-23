@@ -78,6 +78,7 @@ public class BpApplication implements Observer {
 	}
 
 	public List<String> getNeighborList() {
+		//The list, as the buffer is cleared, is copied.
 		ArrayList<String> list = new ArrayList<String>();
 		list.addAll(this.dispatcher.getNeighborList());
 		return list;
