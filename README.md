@@ -45,7 +45,7 @@ Here is a full example:
         }
 ```
 
-Added to sending and receving bundles, the command `neighbor list` from the `protocol extended` is also available. To perform this method, call `List<String> BpApplication::getNeighborList()`.
+Added to sending and receving bundles, the command `neighbor list` from the `protocol extended` is also available. To perform this method, call [`List<String> BpApplication::getNeighborList()`](src/org/ibrdtnapi/BpApplication.java#L80).
 
 How does it work ?
 ------------------
@@ -68,10 +68,11 @@ Note that this measurement include the delay of registration.
 ### Registration
 The average delay for an [app](src/org/ibrdtnapi/BpApplication.java) to create the Java object and successfully register to the daemon is about 27 ms.
 ### CPU usage
-This code was first a POC of an easy-to-use IBR-DTN Java interface. The code has been made in a **quick-and-dirty** way. This include many lines with `while(this.dispatcher.getState() != State.SOME_STATE);`. These active wait are CPU eater, even though two `while();` _at most_ can run at the same time.
-A *quick-and-dirty* (again, but well... A PhD Thesis is already consuming, isn't it?) solution would be to add a `Thread.Sleep(5);`. This would (partially) solve the CPU usage.
-A *clean* solution to handle this would be to develop a state automate by using Java Future.
-Here is the output of `time` to receive 200 bundle using the `dtnrecv` command-line tool, and the Java interface:
+This code was first a POC of an easy-to-use IBR-DTN Java interface. The code has been made in a **quick-and-dirty** way. This include many lines with `while(this.dispatcher.getState() != State.SOME_STATE);`. These active waits are CPU hungry, even though two `while();` _at most_ can run at the same time.
+A **quick-and-dirty** (again, but well... A PhD Thesis is time-consuming, isn't it?) solution would be to add a `Thread.Sleep(1);`. This would (partially) solve the CPU usage.
+A *cleaner* solution to handle this would be to develop a state automate by using Java Future and state Listeners.
+
+Here is the output of `time` to receive 200 bundles using the `dtnrecv` command-line tool, and this Java interface:
 ````bash
 dtnrecv --count 200 --name test 0.02s user 0.01s system 44%  cpu 0.054 total
 #With the CPU hungry version:
