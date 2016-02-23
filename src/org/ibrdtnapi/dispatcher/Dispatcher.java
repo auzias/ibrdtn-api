@@ -132,8 +132,6 @@ public class Dispatcher implements Observer {
 		this.setState(State.IDLE);
 	}
 
-	
-
 	private synchronized void fetch(Bundle bundle) {
 		//Wait to be ready to fetch next bundle
 		while(this.getState() != State.IDLE) { Api.sleepWait(); };
@@ -195,13 +193,13 @@ public class Dispatcher implements Observer {
 		BDL_INFO(16),
 		PLD_BUFFERING(17),
 		PLD_CONSUMED(18),
-		
+
 		SENDING(20),
 		PUTTING(21),
 		BDL_REGISTERED(22),
 		BDL_SENT(23),
 		BDL_BLOCK_ADDING(24),
-		
+
 		NEIGHBOR_LIST(30),
 		NEIGHBOR_LISTED(31);
 
