@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-@SuppressWarnings("restriction")
 public class PayloadBlock {
 	private static final Logger log = Logger.getLogger(Bundle.class.getName());
 	private String encoded = null;
