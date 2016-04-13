@@ -1,10 +1,7 @@
 package org.ibrdtnapi.entities;
 
-import java.io.IOException;
+import java.util.Base64;
 import java.util.logging.Logger;
-
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 public class PayloadBlock {
 	private static final Logger log = Logger.getLogger(Bundle.class.getName());
@@ -37,17 +34,13 @@ public class PayloadBlock {
 
 	public void setEncoded(String encoded) {
 		this.encoded = new String(encoded);
-		try {
-			this.decoded = new BASE64Decoder().decodeBuffer(this.encoded);
-		} catch (IOException e) {
-			PayloadBlock.log.warning("Could not base64::decode() the payload of the bundle:" + this + ". " + e.getMessage());
-		}
+		Base64.getDecoder().decode(this.encoded.getBytes(), this.decoded);
 	}
 
 	private void setDecoded(byte[] decoded) {
 		this.decoded = new byte[decoded.length];
 		System.arraycopy(decoded, 0, this.decoded, 0, decoded.length);
-		this.encoded = new String(new BASE64Encoder().encodeBuffer(this.decoded)).trim();
+		this.encoded = new String(Base64.getEncoder().encode(this.decoded)).trim();
 	}
 
 	public String toString(boolean full) {
