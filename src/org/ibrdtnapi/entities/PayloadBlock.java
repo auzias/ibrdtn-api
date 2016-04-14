@@ -34,7 +34,7 @@ public class PayloadBlock {
 
 	public void setEncoded(String encoded) {
 		this.encoded = new String(encoded);
-		Base64.getDecoder().decode(this.encoded.getBytes(), this.decoded);
+        this.decoded = Base64.getDecoder().decode(this.encoded.getBytes());
 	}
 
 	private void setDecoded(byte[] decoded) {
