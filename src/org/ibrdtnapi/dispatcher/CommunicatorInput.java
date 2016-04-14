@@ -58,8 +58,8 @@ public class CommunicatorInput implements Runnable {
 	@Override
 	public void run() {
 		String str;
-		final int payloadLinesToBufferize = 5;
-		int linesCount = 0;
+		final int payloadLinesToBufferize = 2;
+		int emptyLinesCount = 0;
 		try {
 			while ((str = this.br.readLine()) != null) {
 				this.log(str);
@@ -73,11 +73,15 @@ public class CommunicatorInput implements Runnable {
 						this.dispatcher.setState(State.INFO_BUFFERED);
 				//Otherwise, if payload is sent, bufferize it:
 				}  else if(this.dispatcher.getState() == State.PLD_BUFFERING) {
-					this.buffer.append(str + "\n");
-					linesCount++;
-					if(linesCount == payloadLinesToBufferize) {
-						this.dispatcher.setState(State.PLD_BUFFERED);
-						linesCount = 0;
+					//If the line is empty, count it
+					if (str.trim().isEmpty()) {
+						emptyLinesCount++;
+						if(emptyLinesCount == payloadLinesToBufferize) {
+							this.dispatcher.setState(State.PLD_BUFFERED);
+							emptyLinesCount = 0;
+						}
+					} else {
+						this.buffer.append(str + '\n');
 					}
 				//Otherwise, the neighbor list has been requested:
 				} else if(this.dispatcher.getState() == State.NEIGHBOR_LIST) {
