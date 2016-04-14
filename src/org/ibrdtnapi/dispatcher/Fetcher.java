@@ -78,13 +78,16 @@ public class Fetcher implements Runnable {
 				buffer = new String(this.communicatorInput.getBuffer());
 				String[] payloadBuffer = buffer.split("\n");
 
-				int line = 0;
-				for(String s : payloadBuffer) {
-					if(!s.startsWith("Encoding:"))
-						line++;
+				StringBuilder encoded =  new StringBuilder();
+				final int payloadStartingLine = 2;
+				for (int line = payloadStartingLine; line < payloadBuffer.length; line++) {
+					String s = payloadBuffer[line].trim();
+					if (!s.isEmpty()) {
+						encoded.append(s);
+					}
 				}
-				String encoded = payloadBuffer[line];
-				this.bundle.addEncoded(encoded);
+
+				this.bundle.addEncoded(encoded.toString());
 				this.dispatcher.setState(State.PLD_CONSUMED);
 			}
 
@@ -95,5 +98,4 @@ public class Fetcher implements Runnable {
 			this.communicatorOutput.query("bundle delivered " + this.bundle.getTimestamp() + " " + this.bundle.getSequencenumber() + " " + this.bundle.getSource());
 		}
 	}
-
 }
